@@ -31,7 +31,7 @@ namespace Ly
 	void Renderer::initVulkan()
 	{
 		try {
-			m_vulkanLoader = std::make_unique<Ly::VulkanLoader>();
+			m_vulkanLoader = std::make_unique<Ly::VulkanLoader>(m_window);
 		}
 		catch (const std::runtime_error&) {
 			Ly::Log::error("Error during the vulkanLoader creation process");

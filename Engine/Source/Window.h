@@ -12,11 +12,11 @@ namespace Ly {
 		~Window();
 		bool shouldClose();
 		void poolEvents();
+		GLFWwindow* m_window;
 
 	private:
 		void run();
 		
-		GLFWwindow* m_window;
 		int m_width = 800;
 		int m_height = 600;
 		std::string m_title = "Vulkan";

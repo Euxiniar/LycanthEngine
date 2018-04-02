@@ -3,25 +3,28 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include <Window.h>
 #include <DebugCallback.h>
 #include <Utils/Log.h>
 
 #include <memory>
 #include <vector>
+#include <set>
 
 namespace Ly {
 	struct QueueFamilyIndices {
 		int graphicsFamily = -1;
+		int presentFamily = -1;
 
 		bool matches() {
-			return graphicsFamily >= 0;
+			return graphicsFamily >= 0 && presentFamily >= 0;
 		}
 	};
 
 	class VulkanLoader
 	{
 	public:
-		VulkanLoader();
+		VulkanLoader(std::unique_ptr<Window>& window);
 		~VulkanLoader();
 
 	private:
@@ -30,6 +33,7 @@ namespace Ly {
 		bool checkValidationLayerSupport();
 		std::vector<const char*> getRequiredExtensions();
 		void setupDebugCallback();
+		void createSurface();
 		void pickPhysicalDevice();
 		bool isDeviceSuitable(VkPhysicalDevice device);
 		QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
@@ -43,12 +47,15 @@ namespace Ly {
 #else
 		const bool enableValidationLayers = true;
 #endif
+		std::unique_ptr<Ly::Window>& m_window;
 		VkInstance m_instance;
 		std::string m_appName = "Vulkan";
 		std::string m_engineName = "LycanthEngine";
 		std::unique_ptr<Ly::DebugCallback> m_callback;
+		VkSurfaceKHR m_surface;
 		VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
 		VkDevice m_device;
 		VkQueue m_graphicsQueue;
+		VkQueue m_presentQueue;
 	};
 }

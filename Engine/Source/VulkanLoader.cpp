@@ -2,7 +2,8 @@
 
 namespace Ly 
 {
-	VulkanLoader::VulkanLoader()
+	VulkanLoader::VulkanLoader(std::unique_ptr<Window>& window)
+		: m_window(window)
 	{
 		initVulkan();
 	}
@@ -13,6 +14,7 @@ namespace Ly
 		if (enableValidationLayers) {
 			m_callback.reset();
 		}
+		vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
 		vkDestroyInstance(m_instance, nullptr);
 	}
 
@@ -20,6 +22,7 @@ namespace Ly
 	{
 		createInstance();
 		setupDebugCallback();
+		createSurface();
 		pickPhysicalDevice();
 		createLogicalDevice();
 	}
@@ -27,7 +30,7 @@ namespace Ly
 	void VulkanLoader::createInstance()
 	{
 		if (enableValidationLayers && !checkValidationLayerSupport()) {
-			Ly::Log::error("validation layers requested, but not available!");
+			Ly::Log::error("Validation layers requested, but not available!");
 		}
 
 		VkApplicationInfo appInfo = {};
@@ -126,6 +129,13 @@ namespace Ly
 		}
 	}
 
+	void VulkanLoader::createSurface()
+	{
+		if (glfwCreateWindowSurface(m_instance, m_window->m_window, nullptr, &m_surface) != VK_SUCCESS) {
+			Ly::Log::error("Failed to create Window Surface !");
+		}
+	}
+
 	void VulkanLoader::pickPhysicalDevice()
 	{
 		uint32_t deviceCount = 0;
@@ -171,6 +181,13 @@ namespace Ly
 				indices.graphicsFamily = i;
 			}
 
+			VkBool32 presentSupport = false;
+			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface, &presentSupport);
+
+			if (queueFamily.queueCount > 0 && presentSupport) {
+				indices.presentFamily = i;
+			}
+
 			if (indices.matches()) {
 				break;
 			}
@@ -185,20 +202,25 @@ namespace Ly
 	{
 		QueueFamilyIndices indices = findQueueFamilies(m_physicalDevice);
 
-		VkDeviceQueueCreateInfo queueCreateInfo = {};
-		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		queueCreateInfo.queueFamilyIndex = indices.graphicsFamily;
-		queueCreateInfo.queueCount = 1;
+		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+		std::set<int> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };
 
 		float queuePriority = 1.0f;
-		queueCreateInfo.pQueuePriorities = &queuePriority;
+		for (int queueFamily : uniqueQueueFamilies) {
+			VkDeviceQueueCreateInfo queueCreateInfo = {};
+			queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queueCreateInfo.queueFamilyIndex = queueFamily;
+			queueCreateInfo.queueCount = 1;
+			queueCreateInfo.pQueuePriorities = &queuePriority;
+			queueCreateInfos.push_back(queueCreateInfo);
+		}
 
 		VkPhysicalDeviceFeatures deviceFeatures = {};
 
 		VkDeviceCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		createInfo.pQueueCreateInfos = &queueCreateInfo;
-		createInfo.queueCreateInfoCount = 1;
+		createInfo.pQueueCreateInfos = queueCreateInfos.data();
+		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 		createInfo.pEnabledFeatures = &deviceFeatures;
 		createInfo.enabledExtensionCount = 0;
 
@@ -215,5 +237,6 @@ namespace Ly
 		}
 
 		vkGetDeviceQueue(m_device, indices.graphicsFamily, 0, &m_graphicsQueue);
+		vkGetDeviceQueue(m_device, indices.presentFamily, 0, &m_presentQueue);
 	}
 }
