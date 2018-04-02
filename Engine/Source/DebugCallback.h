@@ -18,9 +18,9 @@ namespace Ly {
 	public:
 		DebugCallback(VkInstance & instance);
 		~DebugCallback();
-		VkResult CreateDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo,
+		VkResult createDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo,
 			const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback);
-		void DestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback, 
+		void destroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback, 
 			const VkAllocationCallbacks* pAllocator);
 	private:
 		VkInstance& m_instance;

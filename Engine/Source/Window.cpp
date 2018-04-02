@@ -14,12 +14,12 @@ namespace Ly
 		glfwTerminate();
 	}
 
-	bool Window::ShouldClose()
+	bool Window::shouldClose()
 	{
 		return glfwWindowShouldClose(m_window);
 	}
 
-	void Window::PoolEvents()
+	void Window::poolEvents()
 	{
 		glfwPollEvents();
 	}

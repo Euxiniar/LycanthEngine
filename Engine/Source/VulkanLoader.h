@@ -10,17 +10,30 @@
 #include <vector>
 
 namespace Ly {
+	struct QueueFamilyIndices {
+		int graphicsFamily = -1;
+
+		bool matches() {
+			return graphicsFamily >= 0;
+		}
+	};
+
 	class VulkanLoader
 	{
 	public:
 		VulkanLoader();
 		~VulkanLoader();
+
 	private:
 		void initVulkan();
 		void createInstance();
 		bool checkValidationLayerSupport();
 		std::vector<const char*> getRequiredExtensions();
 		void setupDebugCallback();
+		void pickPhysicalDevice();
+		bool isDeviceSuitable(VkPhysicalDevice device);
+		QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+		void createLogicalDevice();
 
 		const std::vector<const char*> m_validationLayers = {
 			"VK_LAYER_LUNARG_standard_validation"
@@ -34,5 +47,8 @@ namespace Ly {
 		std::string m_appName = "Vulkan";
 		std::string m_engineName = "LycanthEngine";
 		std::unique_ptr<Ly::DebugCallback> m_callback;
+		VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
+		VkDevice m_device;
+		VkQueue m_graphicsQueue;
 	};
 }

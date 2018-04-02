@@ -40,8 +40,8 @@ namespace Ly
 
 	void Renderer::mainLoop()
 	{
-		while (!m_window->ShouldClose()) {
-			m_window->PoolEvents();
+		while (!m_window->shouldClose()) {
+			m_window->poolEvents();
 		}
 	}
 

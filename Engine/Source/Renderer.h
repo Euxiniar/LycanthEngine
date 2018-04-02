@@ -11,6 +11,7 @@ namespace Ly {
 		~Renderer();
 
 		void run();
+
 	private:
 		void initWindow();
 		void initVulkan();

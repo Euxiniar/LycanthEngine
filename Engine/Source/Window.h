@@ -10,8 +10,9 @@ namespace Ly {
 	public:
 		Window(std::string title = "Vulkan", int width = 800, int height = 600);
 		~Window();
-		bool ShouldClose();
-		void PoolEvents();
+		bool shouldClose();
+		void poolEvents();
+
 	private:
 		void run();
 		
