@@ -10,6 +10,9 @@ namespace Ly
 
 	VulkanLoader::~VulkanLoader()
 	{
+		for (auto imageView : m_swapChainImageViews) {
+			vkDestroyImageView(m_device, imageView, nullptr);
+		}
 		vkDestroySwapchainKHR(m_device, m_swapChain, nullptr);
 		vkDestroyDevice(m_device, nullptr);
 		if (enableValidationLayers) {
@@ -27,6 +30,7 @@ namespace Ly
 		pickPhysicalDevice();
 		createLogicalDevice();
 		createSwapChain();
+		createImageViews();
 	}
 
 	void VulkanLoader::createInstance()
@@ -313,12 +317,12 @@ namespace Ly
 		VkPresentModeKHR bestMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
 
 		for (const auto& availablePresentMode : availablePresentModes) {
-			if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-				return availablePresentMode;
-			}
-			else if (availablePresentMode == VK_PRESENT_MODE_FIFO_KHR) {
-				bestMode = availablePresentMode;
-			}
+if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+	return availablePresentMode;
+}
+else if (availablePresentMode == VK_PRESENT_MODE_FIFO_KHR) {
+	bestMode = availablePresentMode;
+}
 		}
 		return VK_PRESENT_MODE_FIFO_KHR;
 	}
@@ -327,7 +331,7 @@ namespace Ly
 	{
 		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 			return capabilities.currentExtent;
-			
+
 		}
 		else {
 			VkExtent2D actualExtent = { (uint32_t)m_window->m_width, (uint32_t)m_window->m_height };
@@ -389,7 +393,33 @@ namespace Ly
 		m_swapChainImages.resize(imageCount);
 		vkGetSwapchainImagesKHR(m_device, m_swapChain, &imageCount, m_swapChainImages.data());
 
-		m_swapChainImagesFormat = surfaceFormat.format;
+		m_swapChainImageFormat = surfaceFormat.format;
 		m_swapChainExtent = extent;
-	} 
+	}
+
+	void VulkanLoader::createImageViews()
+	{
+		m_swapChainImageViews.resize(m_swapChainImages.size());
+
+		for (size_t i = 0; i < m_swapChainImages.size(); i++) {
+			VkImageViewCreateInfo createInfo = {};
+			createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+			createInfo.image = m_swapChainImages[i];
+			createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+			createInfo.format = m_swapChainImageFormat;
+			createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+			createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+			createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+			createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+			createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			createInfo.subresourceRange.baseMipLevel = 0;
+			createInfo.subresourceRange.levelCount = 1;
+			createInfo.subresourceRange.baseArrayLayer = 0;
+			createInfo.subresourceRange.layerCount = 1;
+
+			if (vkCreateImageView(m_device, &createInfo, nullptr, &m_swapChainImageViews[i]) != VK_SUCCESS) {
+				Ly::Log::error("Failed to create Image View !");
+			}
+		}
+	}
 }

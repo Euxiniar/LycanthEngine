@@ -57,7 +57,7 @@ namespace Ly {
 		VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 		VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 		void createSwapChain();
-
+		void createImageViews();
 
 		const std::vector<const char*> m_validationLayers = {
 			"VK_LAYER_LUNARG_standard_validation"
@@ -84,7 +84,8 @@ namespace Ly {
 		VkQueue m_presentQueue;
 		VkSwapchainKHR m_swapChain;
 		std::vector<VkImage> m_swapChainImages;
-		VkFormat m_swapChainImagesFormat;
+		VkFormat m_swapChainImageFormat;
 		VkExtent2D m_swapChainExtent;
+		std::vector<VkImageView> m_swapChainImageViews;
 	};
 }
