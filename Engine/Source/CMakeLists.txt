@@ -9,6 +9,12 @@ set(BASE
     ${DIR}/Window.cpp
 	${DIR}/DebugCallback.h
     ${DIR}/DebugCallback.cpp
+	${DIR}/Instance.h
+	${DIR}/Instance.cpp
+	${DIR}/ValidationLayers.h
+	${DIR}/ValidationLayers.cpp
+	${DIR}/Extensions.h
+	${DIR}/Extensions.cpp
     PARENT_SCOPE
 )
 

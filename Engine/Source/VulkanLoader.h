@@ -5,6 +5,7 @@
 
 #include <Window.h>
 #include <DebugCallback.h>
+#include <Instance.h>
 #include <Utils/Log.h>
 
 #include <memory>
@@ -14,9 +15,9 @@
 
 namespace Ly {
 	struct QueueFamilyIndices {
-		//Queue Family wich supports graphics
+		//Queue Family which supports graphics
 		int graphicsFamily = -1;
-		//Queue Family wich supports display presentation
+		//Queue Family which supports display presentation
 		int presentFamily = -1;
 
 		bool matches() {
@@ -42,9 +43,8 @@ namespace Ly {
 
 	private:
 		void initVulkan();
+		void enableValidationLayers();
 		void createInstance();
-		bool checkValidationLayerSupport();
-		std::vector<const char*> getRequiredExtensions();
 		void setupDebugCallback();
 		void createSurface();
 		void pickPhysicalDevice();
@@ -59,21 +59,13 @@ namespace Ly {
 		void createSwapChain();
 		void createImageViews();
 
-		const std::vector<const char*> m_validationLayers = {
-			"VK_LAYER_LUNARG_standard_validation"
-		};
-#ifdef NDEBUG
-		const bool enableValidationLayers = false;
-#else
-		const bool enableValidationLayers = true;
-#endif
-
 		const std::vector<const char*> m_deviceExtensions = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
 		};
 
 		std::unique_ptr<Ly::Window>& m_window;
-		VkInstance m_instance;
+		std::unique_ptr<Ly::Instance> m_instance;
+		std::unique_ptr<Ly::ValidationLayers> m_validationLayers;
 		std::string m_appName = "Vulkan";
 		std::string m_engineName = "LycanthEngine";
 		std::unique_ptr<Ly::DebugCallback> m_callback;
