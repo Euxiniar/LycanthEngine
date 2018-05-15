@@ -2,6 +2,9 @@
 #include <vulkan/vulkan.h>
 #include <Utils/Log.h>
 #include <vector>
+#include <algorithm>
+#include <Window.h>
+#include <QueueFamily.h>
 
 namespace Ly {
 	struct SwapChainSupportDetails {
@@ -16,7 +19,30 @@ namespace Ly {
 
 	class Swapchain {
 	public:
+		Swapchain(std::unique_ptr<Ly::Window>& window,
+		VkPhysicalDevice& physicalDevice,
+		VkSurfaceKHR& surface,
+		VkDevice& device,
+		std::vector<VkImage>& swapChainImages,
+		VkFormat& swapChainImageFormat,
+		VkExtent2D& swapChainExtent);
+		~Swapchain();
 		static SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
 
+	private:
+		VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+		VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+		VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR & capabilities);
+		void createSwapChain();
+
+		std::unique_ptr<Ly::Window>& m_window;
+		VkPhysicalDevice& m_physicalDevice;
+		VkSurfaceKHR& m_surface;
+		VkDevice& m_device;
+		std::vector<VkImage>& m_swapChainImages;
+		VkFormat& m_swapChainImageFormat;
+		VkExtent2D& m_swapChainExtent;
+
+		VkSwapchainKHR m_swapChain;
 	};
 }

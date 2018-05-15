@@ -32,9 +32,6 @@ namespace Ly {
 		void createSurface();
 		void createPhysicalDevice();
 		void createLogicalDevice();
-		VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-		VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-		VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 		void createSwapChain();
 		void createImageViews();
 
@@ -53,7 +50,7 @@ namespace Ly {
 		std::unique_ptr<Ly::LogicalDevice> m_device;
 		VkQueue m_graphicsQueue;
 		VkQueue m_presentQueue;
-		VkSwapchainKHR m_swapChain;
+		std::unique_ptr<Swapchain> m_swapChain;
 		std::vector<VkImage> m_swapChainImages;
 		VkFormat m_swapChainImageFormat;
 		VkExtent2D m_swapChainExtent;
