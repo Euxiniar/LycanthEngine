@@ -8,6 +8,9 @@
 #include <Instance.h>
 #include <PhysicalDevice.h>
 #include <Utils/Log.h>
+#include <Swapchain.h>
+#include <QueueFamily.h>
+#include <LogicalDevice.h>
 
 #include <memory>
 #include <vector>
@@ -28,9 +31,7 @@ namespace Ly {
 		void setupDebugCallback();
 		void createSurface();
 		void createPhysicalDevice();
-		QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 		void createLogicalDevice();
-		SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 		VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 		VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 		VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
@@ -49,7 +50,7 @@ namespace Ly {
 		std::unique_ptr<Ly::DebugCallback> m_callback;
 		VkSurfaceKHR m_surface;
 		std::unique_ptr<Ly::PhysicalDevice> m_physicalDevice;
-		VkDevice m_device;
+		std::unique_ptr<Ly::LogicalDevice> m_device;
 		VkQueue m_graphicsQueue;
 		VkQueue m_presentQueue;
 		VkSwapchainKHR m_swapChain;

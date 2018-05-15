@@ -21,6 +21,8 @@ set(BASE
 	${DIR}/QueueFamily.cpp
 	${DIR}/Swapchain.h
 	${DIR}/Swapchain.cpp
+	${DIR}/LogicalDevice.h
+	${DIR}/LogicalDevice.cpp
     PARENT_SCOPE
 )
 

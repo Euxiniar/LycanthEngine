@@ -11,10 +11,10 @@ namespace Ly
 	VulkanLoader::~VulkanLoader()
 	{
 		for (auto imageView : m_swapChainImageViews) {
-			vkDestroyImageView(m_device, imageView, nullptr);
+			vkDestroyImageView(m_device->get(), imageView, nullptr);
 		}
-		vkDestroySwapchainKHR(m_device, m_swapChain, nullptr);
-		vkDestroyDevice(m_device, nullptr);
+		vkDestroySwapchainKHR(m_device->get(), m_swapChain, nullptr);
+		m_device.reset();
 		if (Ly::ValidationLayers::areEnabled()) {
 			m_callback.reset();
 		}
@@ -66,107 +66,11 @@ namespace Ly
 		m_physicalDevice = std::make_unique<Ly::PhysicalDevice>(m_instance->get(), m_surface);
 	}
 
-
-
-	QueueFamilyIndices VulkanLoader::findQueueFamilies(VkPhysicalDevice device)
-	{
-		QueueFamilyIndices indices;
-
-		uint32_t queueFamilyCount = 0;
-		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-
-		std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
-
-		int i = 0;
-		for (const auto& queueFamily : queueFamilies) {
-			if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-				indices.graphicsFamily = i;
-			}
-
-			VkBool32 presentSupport = false;
-			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface, &presentSupport);
-
-			if (queueFamily.queueCount > 0 && presentSupport) {
-				indices.presentFamily = i;
-			}
-
-			if (indices.matches()) {
-				break;
-			}
-
-			i++;
-		}
-
-		return indices;
-	}
-
 	void VulkanLoader::createLogicalDevice()
 	{
-		QueueFamilyIndices indices = findQueueFamilies(m_physicalDevice->get());
-
-		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-		std::set<int> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };
-
-		float queuePriority = 1.0f;
-		for (int queueFamily : uniqueQueueFamilies) {
-			VkDeviceQueueCreateInfo queueCreateInfo = {};
-			queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-			queueCreateInfo.queueFamilyIndex = queueFamily;
-			queueCreateInfo.queueCount = 1;
-			queueCreateInfo.pQueuePriorities = &queuePriority;
-			queueCreateInfos.push_back(queueCreateInfo);
-		}
-
-		VkPhysicalDeviceFeatures deviceFeatures = {};
-
-		VkDeviceCreateInfo createInfo = {};
-		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		createInfo.pQueueCreateInfos = queueCreateInfos.data();
-		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
-		createInfo.pEnabledFeatures = &deviceFeatures;
-		createInfo.enabledExtensionCount = static_cast<uint32_t>(m_deviceExtensions.size());
-		createInfo.ppEnabledExtensionNames = m_deviceExtensions.data();
-
-		if (Ly::ValidationLayers::areEnabled()) {
-			createInfo.enabledLayerCount = static_cast<uint32_t>(m_validationLayers->get().size());
-			createInfo.ppEnabledLayerNames = m_validationLayers->get().data();
-		}
-		else {
-			createInfo.enabledLayerCount = 0;
-		}
-
-		if (vkCreateDevice(m_physicalDevice->get(), &createInfo, nullptr, &m_device) != VK_SUCCESS) {
-			Ly::Log::error("Failed to create logical device !");
-		}
-
-		vkGetDeviceQueue(m_device, indices.graphicsFamily, 0, &m_graphicsQueue);
-		vkGetDeviceQueue(m_device, indices.presentFamily, 0, &m_presentQueue);
-	}
-
-	SwapChainSupportDetails VulkanLoader::querySwapChainSupport(VkPhysicalDevice device)
-	{
-		SwapChainSupportDetails details;
-
-		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, m_surface, &details.capabilities);
-
-		//Define supported formats
-		uint32_t formatCount;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_surface, &formatCount, nullptr);
-		if (formatCount != 0) {
-			details.formats.resize(formatCount);
-			vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_surface, &formatCount, details.formats.data());
-		}
-
-		//Define present modes
-		uint32_t presentModeCount;
-		vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, nullptr);
-		if (presentModeCount != 0) {
-			details.presentModes.resize(presentModeCount);
-			vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, details.presentModes.data());
-		}
-
-		return details;
+		m_device = std::make_unique<Ly::LogicalDevice>(m_physicalDevice->get(), 
+			m_surface, m_validationLayers->get(), 
+			m_deviceExtensions, m_graphicsQueue, m_presentQueue);
 	}
 
 	VkSurfaceFormatKHR VulkanLoader::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
@@ -216,7 +120,7 @@ else if (availablePresentMode == VK_PRESENT_MODE_FIFO_KHR) {
 
 	void VulkanLoader::createSwapChain()
 	{
-		SwapChainSupportDetails swapChainSupport = querySwapChainSupport(m_physicalDevice->get());
+		SwapChainSupportDetails swapChainSupport = Ly::Swapchain::querySwapChainSupport(m_physicalDevice->get(), m_surface);
 
 		VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
 		VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
@@ -237,7 +141,7 @@ else if (availablePresentMode == VK_PRESENT_MODE_FIFO_KHR) {
 		createInfo.imageArrayLayers = 1;
 		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-		QueueFamilyIndices indices = findQueueFamilies(m_physicalDevice->get());
+		QueueFamilyIndices indices = Ly::QueueFamily::findQueueFamilies(m_physicalDevice->get(), m_surface);
 		uint32_t queueFamilyIndices[] = { (uint32_t)indices.graphicsFamily, (uint32_t)indices.presentFamily };
 
 		if (indices.graphicsFamily != indices.presentFamily) {
@@ -256,13 +160,13 @@ else if (availablePresentMode == VK_PRESENT_MODE_FIFO_KHR) {
 		createInfo.clipped = VK_TRUE;
 		createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-		if (vkCreateSwapchainKHR(m_device, &createInfo, nullptr, &m_swapChain) != VK_SUCCESS) {
+		if (vkCreateSwapchainKHR(m_device->get(), &createInfo, nullptr, &m_swapChain) != VK_SUCCESS) {
 			Ly::Log::error("Failed to create Swap Chain !");
 		}
 
-		vkGetSwapchainImagesKHR(m_device, m_swapChain, &imageCount, nullptr);
+		vkGetSwapchainImagesKHR(m_device->get(), m_swapChain, &imageCount, nullptr);
 		m_swapChainImages.resize(imageCount);
-		vkGetSwapchainImagesKHR(m_device, m_swapChain, &imageCount, m_swapChainImages.data());
+		vkGetSwapchainImagesKHR(m_device->get(), m_swapChain, &imageCount, m_swapChainImages.data());
 
 		m_swapChainImageFormat = surfaceFormat.format;
 		m_swapChainExtent = extent;
@@ -288,7 +192,7 @@ else if (availablePresentMode == VK_PRESENT_MODE_FIFO_KHR) {
 			createInfo.subresourceRange.baseArrayLayer = 0;
 			createInfo.subresourceRange.layerCount = 1;
 
-			if (vkCreateImageView(m_device, &createInfo, nullptr, &m_swapChainImageViews[i]) != VK_SUCCESS) {
+			if (vkCreateImageView(m_device->get(), &createInfo, nullptr, &m_swapChainImageViews[i]) != VK_SUCCESS) {
 				Ly::Log::error("Failed to create Image View !");
 			}
 		}
