@@ -2,7 +2,7 @@
 
 
 namespace Ly {
-	std::vector<const char*> Extensions::getRequiredExtensions()
+	std::vector<const char*> Extensions::getRequiredInstanceExtensions()
 	{
 		uint32_t glfwExtensionCount = 0;
 		const char** glfwExtensions;
@@ -17,7 +17,7 @@ namespace Ly {
 		return extensions;
 	}
 
-	void Extensions::showAvailableExtensions()
+	void Extensions::showAvailableInstanceExtensions()
 	{
 		uint32_t extensionCount = 0;
 		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);

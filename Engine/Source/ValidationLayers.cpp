@@ -2,10 +2,12 @@
 
 namespace Ly {
 
-	ValidationLayers::ValidationLayers(const char * validationLayers = "VK_LAYER_LUNARG_standard_validation")
+	ValidationLayers::ValidationLayers(const char * validationLayers)
 	{
-		m_validationLayers.push_back(validationLayers);
-		areSupported();
+		if (areEnabled()) {
+			m_validationLayers.push_back(validationLayers);
+			areSupported();
+		}
 	}
 
 	ValidationLayers::~ValidationLayers()

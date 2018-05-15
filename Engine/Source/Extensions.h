@@ -8,7 +8,7 @@
 namespace Ly {
 	class Extensions {
 	public:
-		static std::vector<const char*> getRequiredExtensions();
-		static void showAvailableExtensions();
+		static std::vector<const char*> getRequiredInstanceExtensions();
+		static void showAvailableInstanceExtensions();
 	};
 }

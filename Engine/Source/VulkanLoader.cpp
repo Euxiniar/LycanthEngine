@@ -24,9 +24,8 @@ namespace Ly
 
 	void VulkanLoader::initVulkan()
 	{
-		if (Ly::ValidationLayers::areEnabled()) {
-			enableValidationLayers();
-		}
+
+		createValidationLayers();
 		createInstance();
 		setupDebugCallback();
 		createSurface();
@@ -36,7 +35,7 @@ namespace Ly
 		createImageViews();
 	}
 
-	void VulkanLoader::enableValidationLayers()
+	void VulkanLoader::createValidationLayers()
 	{
 		m_validationLayers = std::make_unique<Ly::ValidationLayers>("VK_LAYER_LUNARG_standard_validation");
 	}

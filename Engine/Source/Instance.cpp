@@ -28,10 +28,10 @@ namespace Ly {
 		appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 		appInfo.apiVersion = VK_API_VERSION_1_1;
 
-		Ly::Extensions::showAvailableExtensions();
+		Ly::Extensions::showAvailableInstanceExtensions();
 
 		//Get the required Vulkan extensions
-		auto extensions = Ly::Extensions::getRequiredExtensions();
+		auto extensions = Ly::Extensions::getRequiredInstanceExtensions();
 
 		//Specify instance informations
 		VkInstanceCreateInfo createInfo = {};

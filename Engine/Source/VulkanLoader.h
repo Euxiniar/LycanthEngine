@@ -43,7 +43,7 @@ namespace Ly {
 
 	private:
 		void initVulkan();
-		void enableValidationLayers();
+		void createValidationLayers();
 		void createInstance();
 		void setupDebugCallback();
 		void createSurface();
