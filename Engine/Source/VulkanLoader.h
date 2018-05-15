@@ -6,6 +6,7 @@
 #include <Window.h>
 #include <DebugCallback.h>
 #include <Instance.h>
+#include <PhysicalDevice.h>
 #include <Utils/Log.h>
 
 #include <memory>
@@ -14,27 +15,6 @@
 #include <algorithm>
 
 namespace Ly {
-	struct QueueFamilyIndices {
-		//Queue Family which supports graphics
-		int graphicsFamily = -1;
-		//Queue Family which supports display presentation
-		int presentFamily = -1;
-
-		bool matches() {
-			return graphicsFamily >= 0 && presentFamily >= 0;
-		}
-	};
-
-	struct SwapChainSupportDetails {
-		//Min/Max number of images in the swapchain
-		//Min/Max images size in the swapchain
-		VkSurfaceCapabilitiesKHR capabilities;
-		//Pixel Format/Color Space
-		std::vector<VkSurfaceFormatKHR> formats;
-		//Image resolution in the swapchain
-		std::vector<VkPresentModeKHR> presentModes;
-	};
-
 	class VulkanLoader
 	{
 	public:
@@ -47,9 +27,7 @@ namespace Ly {
 		void createInstance();
 		void setupDebugCallback();
 		void createSurface();
-		void pickPhysicalDevice();
-		bool isDeviceSuitable(VkPhysicalDevice device);
-		bool checkDeviceExtensionSupport(VkPhysicalDevice device);
+		void createPhysicalDevice();
 		QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 		void createLogicalDevice();
 		SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
@@ -70,7 +48,7 @@ namespace Ly {
 		std::string m_engineName = "LycanthEngine";
 		std::unique_ptr<Ly::DebugCallback> m_callback;
 		VkSurfaceKHR m_surface;
-		VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
+		std::unique_ptr<Ly::PhysicalDevice> m_physicalDevice;
 		VkDevice m_device;
 		VkQueue m_graphicsQueue;
 		VkQueue m_presentQueue;

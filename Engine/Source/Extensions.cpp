@@ -30,4 +30,20 @@ namespace Ly {
 			Ly::Log::info(extension.extensionName);
 		}
 	}
+
+	bool Extensions::checkDeviceExtensionSupport(VkPhysicalDevice & device, std::vector<const char *> deviceExtensions)
+	{
+		uint32_t extensionsCount;
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsCount, nullptr);
+
+		std::vector<VkExtensionProperties> availableExtensions(extensionsCount);
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsCount, availableExtensions.data());
+
+		std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+		for (const auto& extension : availableExtensions) {
+			requiredExtensions.erase(extension.extensionName);
+		}
+
+		return requiredExtensions.empty();
+	}
 }

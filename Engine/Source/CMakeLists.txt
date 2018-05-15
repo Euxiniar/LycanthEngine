@@ -15,6 +15,12 @@ set(BASE
 	${DIR}/ValidationLayers.cpp
 	${DIR}/Extensions.h
 	${DIR}/Extensions.cpp
+	${DIR}/PhysicalDevice.h
+	${DIR}/PhysicalDevice.cpp
+	${DIR}/QueueFamily.h
+	${DIR}/QueueFamily.cpp
+	${DIR}/Swapchain.h
+	${DIR}/Swapchain.cpp
     PARENT_SCOPE
 )
 

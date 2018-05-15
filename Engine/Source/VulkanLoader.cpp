@@ -24,12 +24,11 @@ namespace Ly
 
 	void VulkanLoader::initVulkan()
 	{
-
 		createValidationLayers();
 		createInstance();
 		setupDebugCallback();
 		createSurface();
-		pickPhysicalDevice();
+		createPhysicalDevice();
 		createLogicalDevice();
 		createSwapChain();
 		createImageViews();
@@ -62,60 +61,12 @@ namespace Ly
 		}
 	}
 
-	void VulkanLoader::pickPhysicalDevice()
+	void VulkanLoader::createPhysicalDevice()
 	{
-		uint32_t deviceCount = 0;
-		vkEnumeratePhysicalDevices(m_instance->get(), &deviceCount, nullptr);
-		if (deviceCount == 0) {
-			Ly::Log::error("Failed to find GPUs with Vulkan support !");
-		}
-
-		std::vector<VkPhysicalDevice> devices(deviceCount);
-		vkEnumeratePhysicalDevices(m_instance->get(), &deviceCount, devices.data());
-		
-		for (const auto& device : devices) {
-			if (isDeviceSuitable(device)) {
-				m_physicalDevice = device;
-				break;
-			}
-		}
-
-		if (m_physicalDevice == VK_NULL_HANDLE) {
-			Ly::Log::error("Failed to find a suitable GPU !");
-		}
+		m_physicalDevice = std::make_unique<Ly::PhysicalDevice>(m_instance->get(), m_surface);
 	}
 
-	bool VulkanLoader::isDeviceSuitable(VkPhysicalDevice device)
-	{
-		QueueFamilyIndices indices = findQueueFamilies(device);
 
-		bool extensionSupported = checkDeviceExtensionSupport(device);
-
-		bool swapChainAdequate = false;
-		if (extensionSupported) {
-			SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
-			swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
-		}
-
-
-		return indices.matches() && extensionSupported && swapChainAdequate;
-	}
-
-	bool VulkanLoader::checkDeviceExtensionSupport(VkPhysicalDevice device)
-	{
-		uint32_t extensionsCount;
-		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsCount, nullptr);
-
-		std::vector<VkExtensionProperties> availableExtensions(extensionsCount);
-		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsCount, availableExtensions.data());
-
-		std::set<std::string> requiredExtensions(m_deviceExtensions.begin(), m_deviceExtensions.end());
-		for (const auto& extension : availableExtensions) {
-			requiredExtensions.erase(extension.extensionName);
-		}
-
-		return requiredExtensions.empty();
-	}
 
 	QueueFamilyIndices VulkanLoader::findQueueFamilies(VkPhysicalDevice device)
 	{
@@ -152,7 +103,7 @@ namespace Ly
 
 	void VulkanLoader::createLogicalDevice()
 	{
-		QueueFamilyIndices indices = findQueueFamilies(m_physicalDevice);
+		QueueFamilyIndices indices = findQueueFamilies(m_physicalDevice->get());
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 		std::set<int> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };
@@ -185,7 +136,7 @@ namespace Ly
 			createInfo.enabledLayerCount = 0;
 		}
 
-		if (vkCreateDevice(m_physicalDevice, &createInfo, nullptr, &m_device) != VK_SUCCESS) {
+		if (vkCreateDevice(m_physicalDevice->get(), &createInfo, nullptr, &m_device) != VK_SUCCESS) {
 			Ly::Log::error("Failed to create logical device !");
 		}
 
@@ -265,7 +216,7 @@ else if (availablePresentMode == VK_PRESENT_MODE_FIFO_KHR) {
 
 	void VulkanLoader::createSwapChain()
 	{
-		SwapChainSupportDetails swapChainSupport = querySwapChainSupport(m_physicalDevice);
+		SwapChainSupportDetails swapChainSupport = querySwapChainSupport(m_physicalDevice->get());
 
 		VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
 		VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
@@ -286,7 +237,7 @@ else if (availablePresentMode == VK_PRESENT_MODE_FIFO_KHR) {
 		createInfo.imageArrayLayers = 1;
 		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-		QueueFamilyIndices indices = findQueueFamilies(m_physicalDevice);
+		QueueFamilyIndices indices = findQueueFamilies(m_physicalDevice->get());
 		uint32_t queueFamilyIndices[] = { (uint32_t)indices.graphicsFamily, (uint32_t)indices.presentFamily };
 
 		if (indices.graphicsFamily != indices.presentFamily) {
