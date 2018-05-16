@@ -10,6 +10,7 @@ namespace Ly
 
 	VulkanLoader::~VulkanLoader()
 	{
+		m_graphicsPipeline.reset();
 		m_swapChainImageViews.reset();
 		m_swapChain.reset();
 		m_device.reset();
@@ -30,6 +31,7 @@ namespace Ly
 		createLogicalDevice();
 		createSwapChain();
 		createImageViews();
+		createGraphicsPipeline();
 	}
 
 	void VulkanLoader::createValidationLayers()
@@ -81,5 +83,10 @@ namespace Ly
 	void VulkanLoader::createImageViews()
 	{
 		m_swapChainImageViews = std::make_unique<Ly::ImageViews>(m_device->get(), m_swapChainImages, m_swapChainImageFormat);
+	}
+
+	void VulkanLoader::createGraphicsPipeline()
+	{
+		m_graphicsPipeline = std::make_unique<Ly::GraphicsPipeline>(m_device->get(), m_swapChainExtent);
 	}
 }

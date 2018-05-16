@@ -25,6 +25,10 @@ set(BASE
 	${DIR}/LogicalDevice.cpp
 	${DIR}/ImageViews.h
 	${DIR}/ImageViews.cpp
+	${DIR}/GraphicsPipeline.h
+	${DIR}/GraphicsPipeline.cpp
+	${DIR}/ShaderModule.h
+	${DIR}/ShaderModule.cpp
     PARENT_SCOPE
 )
 
