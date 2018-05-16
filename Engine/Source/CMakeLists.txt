@@ -29,6 +29,8 @@ set(BASE
 	${DIR}/GraphicsPipeline.cpp
 	${DIR}/ShaderModule.h
 	${DIR}/ShaderModule.cpp
+	${DIR}/RenderPass.h
+	${DIR}/RenderPass.cpp
     PARENT_SCOPE
 )
 

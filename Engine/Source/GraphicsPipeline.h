@@ -13,6 +13,7 @@ namespace Ly {
 		~GraphicsPipeline();
 
 		void create();
+		VkPipelineLayout& get();
 
 	private:
 		VkDevice & m_device;

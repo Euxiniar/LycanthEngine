@@ -123,4 +123,8 @@ namespace Ly {
 		fragShaderModule.reset();
 		vertShaderModule.reset();
 	}
+	VkPipelineLayout & GraphicsPipeline::get()
+	{
+		return m_pipelineLayout;
+	}
 }

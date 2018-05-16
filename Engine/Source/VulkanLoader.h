@@ -13,6 +13,7 @@
 #include <LogicalDevice.h>
 #include <ImageViews.h>
 #include <GraphicsPipeline.h>
+#include <RenderPass.h>
 
 #include <memory>
 #include <vector>
@@ -37,6 +38,7 @@ namespace Ly {
 		void createSwapChain();
 		void createImageViews();
 		void createGraphicsPipeline();
+		void createRenderPass();
 
 		const std::vector<const char*> m_deviceExtensions = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -59,5 +61,6 @@ namespace Ly {
 		VkExtent2D m_swapChainExtent;
 		std::unique_ptr<ImageViews> m_swapChainImageViews;
 		std::unique_ptr<Ly::GraphicsPipeline> m_graphicsPipeline;
+		std::unique_ptr<Ly::RenderPass> m_renderPass;
 	};
 }
