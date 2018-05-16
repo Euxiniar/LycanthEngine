@@ -33,11 +33,22 @@ if (Vulkan_FOUND)
   target_link_libraries (${PROJECT} ${Vulkan_LIBRARIES})
 endif ()
 
+set(SHADERS
+     ${CMAKE_SOURCE_DIR}/Data/Shaders/frag.spv
+	 ${CMAKE_SOURCE_DIR}/Data/Shaders/vert.spv
+	 ${CMAKE_SOURCE_DIR}/Data/Shaders/shader.frag
+	 ${CMAKE_SOURCE_DIR}/Data/Shaders/shader.vert
+	 ${CMAKE_SOURCE_DIR}/Data/Shaders/compile.bat
+	)
+
 add_library(${ENGINE} STATIC
     ${BASE}
 	${UTILS}
 	${CMAKE_TEXT}
+	${SHADERS}
 )
+
+source_group( Shaders FILES ${SHADERS})
 
 source_group( Engine FILES ${BASE})
 source_group( Utils FILES ${UTILS})
@@ -74,6 +85,10 @@ if(WIN32)
 	LINK_FLAGS_RELEASE "/SUBSYSTEM:CONSOLE" 
 	LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
 endif(WIN32)
+
+
+add_custom_command(TARGET ${PROJECT} PRE_BUILD 
+COMMAND cmd /c ${CMAKE_SOURCE_DIR}/Data/Shaders/compile.bat)
 
 add_custom_command(TARGET ${PROJECT} PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory

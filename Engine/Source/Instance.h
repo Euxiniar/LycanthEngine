@@ -17,5 +17,4 @@ namespace Ly {
 		
 		void createInstance(const char * appName, const char * engineName, std::vector<const char*>& validationLayers);
 	};
-
 }

@@ -51,6 +51,4 @@ namespace Ly {
 		return true;
 #endif
 	}
-
-
 }
