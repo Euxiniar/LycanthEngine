@@ -23,6 +23,8 @@ set(BASE
 	${DIR}/Swapchain.cpp
 	${DIR}/LogicalDevice.h
 	${DIR}/LogicalDevice.cpp
+	${DIR}/ImageViews.h
+	${DIR}/ImageViews.cpp
     PARENT_SCOPE
 )
 
