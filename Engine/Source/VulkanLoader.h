@@ -11,6 +11,7 @@
 #include <Swapchain.h>
 #include <QueueFamily.h>
 #include <LogicalDevice.h>
+#include <ImageViews.h>
 
 #include <memory>
 #include <vector>
@@ -54,6 +55,6 @@ namespace Ly {
 		std::vector<VkImage> m_swapChainImages;
 		VkFormat m_swapChainImageFormat;
 		VkExtent2D m_swapChainExtent;
-		std::vector<VkImageView> m_swapChainImageViews;
+		std::unique_ptr<ImageViews> m_swapChainImageViews;
 	};
 }
