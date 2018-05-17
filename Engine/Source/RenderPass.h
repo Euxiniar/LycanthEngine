@@ -9,6 +9,7 @@ namespace Ly {
 		RenderPass(VkDevice & device,
 		VkFormat& swapChainImageFormat);
 		~RenderPass();
+		VkRenderPass& get();
 
 	private:
 		void create();

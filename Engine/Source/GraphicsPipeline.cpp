@@ -1,6 +1,24 @@
-#include <GraphicsPipeline.h>
+#include "GraphicsPipeline.h"
 
 namespace Ly {
+	GraphicsPipeline::GraphicsPipeline(VkDevice& device, VkExtent2D& swapChainExtent, 
+		VkPipelineLayout & pipelineLayout, VkRenderPass& renderPass)
+		: m_device(device), m_swapChainExtent(swapChainExtent), 
+		m_pipelineLayout(pipelineLayout), m_renderPass(renderPass)
+	{
+		create();
+	}
+
+	GraphicsPipeline::~GraphicsPipeline()
+	{
+		vkDestroyPipeline(m_device, m_graphicsPipeline, nullptr);
+	}
+
+	VkPipeline & GraphicsPipeline::get()
+	{
+		return m_graphicsPipeline;
+	}
+
 	std::vector<char> GraphicsPipeline::readFile(const std::string & filename)
 	{
 		std::ifstream file(filename, std::ios::ate | std::ios::binary);
@@ -20,23 +38,13 @@ namespace Ly {
 		return buffer;
 	}
 
-	GraphicsPipeline::GraphicsPipeline(VkDevice& device, VkExtent2D& swapChainExtent)
-		: m_device(device), m_swapChainExtent(swapChainExtent)
+	void GraphicsPipeline::create()
 	{
-		create();
-	}
-
-	GraphicsPipeline::~GraphicsPipeline()
-	{
-		vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
-	}
-
-	void GraphicsPipeline::create() {
 		auto vertShaderCode = readFile("Data/shaders/vert.spv");
 		auto fragShaderCode = readFile("Data/shaders/frag.spv");
 
 		std::unique_ptr<Ly::ShaderModule> vertShaderModule(new Ly::ShaderModule(vertShaderCode, m_device));
-		std::unique_ptr<Ly::ShaderModule> fragShaderModule(new Ly::ShaderModule(vertShaderCode, m_device));
+		std::unique_ptr<Ly::ShaderModule> fragShaderModule(new Ly::ShaderModule(fragShaderCode, m_device));
 
 		VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 		vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -111,20 +119,27 @@ namespace Ly {
 		colorBlending.blendConstants[2] = 0.0f;
 		colorBlending.blendConstants[3] = 0.0f;
 
-		VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
-		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = 0;
-		pipelineLayoutInfo.pushConstantRangeCount = 0;
+		VkGraphicsPipelineCreateInfo pipelineInfo = {};
+		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+		pipelineInfo.stageCount = 2;
+		pipelineInfo.pStages = shaderStages;
+		pipelineInfo.pVertexInputState = &vertexInputInfo;
+		pipelineInfo.pInputAssemblyState = &inputAssembly;
+		pipelineInfo.pViewportState = &viewportState;
+		pipelineInfo.pRasterizationState = &rasterizer;
+		pipelineInfo.pMultisampleState = &multisampling;
+		pipelineInfo.pColorBlendState = &colorBlending;
+		pipelineInfo.layout = m_pipelineLayout;
+		pipelineInfo.renderPass = m_renderPass;
+		pipelineInfo.subpass = 0;
+		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-		if (vkCreatePipelineLayout(m_device, &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
-			Ly::Log::error("Failed to create pipeline layout!");
+		if (vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline) != VK_SUCCESS) {
+			Ly::Log::error("Failed to create graphics pipeline!");
 		}
 
 		fragShaderModule.reset();
 		vertShaderModule.reset();
 	}
-	VkPipelineLayout & GraphicsPipeline::get()
-	{
-		return m_pipelineLayout;
-	}
+
 }

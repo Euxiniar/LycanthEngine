@@ -12,6 +12,11 @@ Ly::RenderPass::~RenderPass()
 	vkDestroyRenderPass(m_device, m_renderPass, nullptr);
 }
 
+VkRenderPass & Ly::RenderPass::get()
+{
+	return m_renderPass;
+}
+
 void Ly::RenderPass::create()
 {
 	VkAttachmentDescription colorAttachment = {};
