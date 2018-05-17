@@ -14,7 +14,7 @@ namespace Ly {
 		m_swapChainImageFormat(swapChainImageFormat),
 		m_swapChainExtent(swapChainExtent)
 	{
-		createSwapChain();
+		create();
 	}
 
 	Swapchain::~Swapchain()
@@ -92,7 +92,7 @@ namespace Ly {
 		}
 	}
 
-	void Swapchain::createSwapChain()
+	void Swapchain::create()
 	{
 		SwapChainSupportDetails swapChainSupport = Ly::Swapchain::querySwapChainSupport(m_physicalDevice, m_surface);
 

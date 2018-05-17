@@ -15,6 +15,6 @@ namespace Ly {
 	private:
 		VkInstance m_instance;
 		
-		void createInstance(const char * appName, const char * engineName, std::vector<const char*>& validationLayers);
+		void create(const char * appName, const char * engineName, std::vector<const char*>& validationLayers);
 	};
 }

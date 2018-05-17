@@ -19,6 +19,6 @@ namespace Ly {
 		std::string m_title = "Vulkan";
 
 	private:
-		void run();
+		void create();
 	};
 }

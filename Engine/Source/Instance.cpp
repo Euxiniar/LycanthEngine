@@ -5,7 +5,7 @@ namespace Ly {
 
 	Instance::Instance(const char * appName, const char * engineName, std::vector<const char*> validationLayers)
 	{
-		createInstance(appName, engineName, validationLayers);
+		create(appName, engineName, validationLayers);
 	}
 
 	Instance::~Instance()
@@ -18,7 +18,7 @@ namespace Ly {
 		return m_instance;
 	}
 
-	void Instance::createInstance(const char * appName, const char * engineName, std::vector<const char*>& validationLayers)
+	void Instance::create(const char * appName, const char * engineName, std::vector<const char*>& validationLayers)
 	{
 		VkApplicationInfo appInfo = {};
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;

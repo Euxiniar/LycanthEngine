@@ -1,7 +1,6 @@
 #include <ShaderModule.h>
 
 namespace Ly {
-
 	ShaderModule::ShaderModule(const std::vector<char>& code, VkDevice & device)
 		: m_code(code), m_device(device)
 	{

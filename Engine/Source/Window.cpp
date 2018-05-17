@@ -5,7 +5,7 @@ namespace Ly
 	Window::Window(std::string title, int width, int height)
 		: m_title(title), m_width(width), m_height(height)
 	{
-		run();
+		create();
 	}
 
 	Window::~Window()
@@ -24,7 +24,7 @@ namespace Ly
 		glfwPollEvents();
 	}
 
-	void Window::run()
+	void Window::create()
 	{
 		glfwInit();
 

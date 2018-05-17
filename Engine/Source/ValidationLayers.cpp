@@ -1,7 +1,6 @@
 #include <ValidationLayers.h>
 
 namespace Ly {
-
 	ValidationLayers::ValidationLayers(const char * validationLayers)
 	{
 		if (areEnabled()) {

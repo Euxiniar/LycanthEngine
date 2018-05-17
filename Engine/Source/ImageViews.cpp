@@ -4,6 +4,7 @@ namespace Ly {
 	ImageViews::ImageViews(VkDevice & device, std::vector<VkImage>& swapChainImages, VkFormat & swapChainImageFormat)
 		: m_device(device), m_swapChainImages(swapChainImages), m_swapChainImageFormat(swapChainImageFormat)
 	{
+		create();
 	}
 
 	ImageViews::~ImageViews()
@@ -13,7 +14,12 @@ namespace Ly {
 		}
 	}
 
-	void ImageViews::createImageViews()
+	std::vector<VkImageView>& ImageViews::get()
+	{
+		return m_swapChainImageViews;
+	}
+
+	void ImageViews::create()
 	{
 		m_swapChainImageViews.resize(m_swapChainImages.size());
 

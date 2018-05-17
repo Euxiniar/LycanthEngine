@@ -33,7 +33,7 @@ namespace Ly {
 		VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 		VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 		VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR & capabilities);
-		void createSwapChain();
+		void create();
 
 		std::unique_ptr<Ly::Window>& m_window;
 		VkPhysicalDevice& m_physicalDevice;

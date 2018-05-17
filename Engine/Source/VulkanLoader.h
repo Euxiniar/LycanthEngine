@@ -15,6 +15,7 @@
 #include <PipelineLayout.h>
 #include <GraphicsPipeline.h>
 #include <RenderPass.h>
+#include <Framebuffers.h>
 
 #include <memory>
 #include <vector>
@@ -41,6 +42,7 @@ namespace Ly {
 		void createRenderPass();
 		void createPipelineLayout();
 		void createGraphicsPipeline();
+		void createFramebuffers();
 
 		const std::vector<const char*> m_deviceExtensions = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -57,13 +59,14 @@ namespace Ly {
 		std::unique_ptr<Ly::LogicalDevice> m_device;
 		VkQueue m_graphicsQueue;
 		VkQueue m_presentQueue;
-		std::unique_ptr<Swapchain> m_swapChain;
+		std::unique_ptr<Ly::Swapchain> m_swapChain;
 		std::vector<VkImage> m_swapChainImages;
 		VkFormat m_swapChainImageFormat;
 		VkExtent2D m_swapChainExtent;
-		std::unique_ptr<ImageViews> m_swapChainImageViews;
+		std::unique_ptr<Ly::ImageViews> m_swapChainImageViews;
 		std::unique_ptr<Ly::PipelineLayout> m_pipelineLayout;
 		std::unique_ptr<Ly::GraphicsPipeline> m_graphicsPipeline;
 		std::unique_ptr<Ly::RenderPass> m_renderPass;
+		std::unique_ptr<Ly::Framebuffers> m_swapChainFramebuffers;
 	};
 }

@@ -11,9 +11,11 @@ namespace Ly {
 		std::vector<VkImage>& swapChainImages,
 		VkFormat& swapChainImageFormat);
 		~ImageViews();
+		std::vector<VkImageView>& get();
+
 	private:
 		std::vector<VkImageView> m_swapChainImageViews;
-		void createImageViews();
+		void create();
 
 		VkDevice& m_device;
 		std::vector<VkImage>& m_swapChainImages;
