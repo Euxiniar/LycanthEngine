@@ -31,6 +31,10 @@ set(BASE
 	${DIR}/ShaderModule.cpp
 	${DIR}/RenderPass.h
 	${DIR}/RenderPass.cpp
+	${DIR}/GraphicsPipeline.h
+	${DIR}/GraphicsPipeline.cpp
+	${DIR}/Framebuffers.h
+	${DIR}/Framebuffers.cpp
     PARENT_SCOPE
 )
 
