@@ -37,6 +37,8 @@ set(BASE
 	${DIR}/Framebuffers.cpp
 	${DIR}/CommandPool.h
 	${DIR}/CommandPool.cpp
+	${DIR}/CommandBuffers.h
+	${DIR}/CommandBuffers.cpp
     PARENT_SCOPE
 )
 

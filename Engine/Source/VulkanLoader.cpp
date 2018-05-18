@@ -10,6 +10,7 @@ namespace Ly
 
 	VulkanLoader::~VulkanLoader()
 	{
+		m_commandPool.reset();
 		m_swapChainFramebuffers.reset();
 		m_graphicsPipeline.reset();
 		m_pipelineLayout.reset();
@@ -90,6 +91,11 @@ namespace Ly
 		m_swapChainImageViews = std::make_unique<Ly::ImageViews>(m_device->get(), m_swapChainImages, m_swapChainImageFormat);
 	}
 
+	void VulkanLoader::createRenderPass()
+	{
+		m_renderPass = std::make_unique<Ly::RenderPass>(m_device->get(), m_swapChainImageFormat);
+	}
+
 	void VulkanLoader::createPipelineLayout()
 	{
 		m_pipelineLayout = std::make_unique<Ly::PipelineLayout>(m_device->get());
@@ -97,12 +103,14 @@ namespace Ly
 
 	void VulkanLoader::createGraphicsPipeline()
 	{
-		m_graphicsPipeline = std::make_unique<Ly::GraphicsPipeline>(m_device->get(), m_swapChainExtent, m_pipelineLayout->get(), m_renderPass->get());
+		m_graphicsPipeline = std::make_unique<Ly::GraphicsPipeline>(m_device->get(), m_swapChainExtent, 
+			m_pipelineLayout->get(), m_renderPass->get());
 	}
 
 	void VulkanLoader::createFramebuffers()
 	{
-		m_swapChainFramebuffers = std::make_unique<Ly::Framebuffers>(m_device->get(), m_swapChainImageViews->get(), m_renderPass->get(), m_swapChainExtent);
+		m_swapChainFramebuffers = std::make_unique<Ly::Framebuffers>(m_device->get(), 
+			m_swapChainImageViews->get(), m_renderPass->get(), m_swapChainExtent);
 	}
 
 	void VulkanLoader::createCommandPool()
@@ -110,8 +118,9 @@ namespace Ly
 		m_commandPool = std::make_unique<Ly::CommandPool>(m_device->get(), m_physicalDevice->get(), m_surface);
 	}
 
-	void VulkanLoader::createRenderPass()
+	void VulkanLoader::createCommandBuffers()
 	{
-		m_renderPass = std::make_unique<Ly::RenderPass>(m_device->get(), m_swapChainImageFormat);
+		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(m_device->get(), m_commandPool->get(), 
+			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent);
 	}
 }

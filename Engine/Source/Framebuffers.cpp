@@ -17,6 +17,11 @@ namespace Ly {
 		}
 	}
 
+	std::vector<VkFramebuffer>& Framebuffers::get()
+	{
+		return m_swapChainFramebuffers;
+	}
+
 	void Framebuffers::create()
 	{
 		m_swapChainFramebuffers.resize(m_swapChainImageViews.size());

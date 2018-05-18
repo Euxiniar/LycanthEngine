@@ -12,6 +12,8 @@ namespace Ly {
 			VkExtent2D& swapChainExtent);
 		~Framebuffers();
 
+		std::vector<VkFramebuffer>& get();
+
 	private:
 		VkDevice & m_device;
 		std::vector<VkImageView>& m_swapChainImageViews;
