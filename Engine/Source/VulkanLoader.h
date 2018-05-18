@@ -53,6 +53,9 @@ namespace Ly {
 		void createCommandBuffers();
 		void createSemaphores();
 
+		void recreateSwapChain();
+		void cleanupSwapChain();
+
 		const std::vector<const char*> m_deviceExtensions = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
 		};

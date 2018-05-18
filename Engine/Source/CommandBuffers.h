@@ -11,7 +11,7 @@ namespace Ly {
 			VkRenderPass& renderPass,
 			VkExtent2D& swapChainExtent);
 		~CommandBuffers();
-		std::vector<VkFramebuffer>& get();
+		std::vector<VkCommandBuffer>& get();
 		VkCommandBuffer& get(uint32_t indice);
 
 	private:

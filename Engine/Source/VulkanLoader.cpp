@@ -8,16 +8,22 @@ namespace Ly
 		initVulkan();
 	}
 
-	VulkanLoader::~VulkanLoader()
+	void VulkanLoader::cleanupSwapChain()
 	{
-		m_semaphores.reset();
-		m_commandPool.reset();
 		m_swapChainFramebuffers.reset();
+		m_commandBuffers.reset();
 		m_graphicsPipeline.reset();
 		m_pipelineLayout.reset();
 		m_renderPass.reset();
 		m_swapChainImageViews.reset();
 		m_swapChain.reset();
+	}
+
+	VulkanLoader::~VulkanLoader()
+	{
+		cleanupSwapChain();
+		m_semaphores.reset();
+		m_commandPool.reset();
 		m_device.reset();
 		if (Ly::ValidationLayers::areEnabled()) {
 			m_callback.reset();
@@ -125,8 +131,8 @@ namespace Ly
 
 	void VulkanLoader::createCommandBuffers()
 	{
-		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(CommandBuffers(m_device->get(), m_commandPool->get(), 
-			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent));
+		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(m_device->get(), m_commandPool->get(), 
+			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent);
 	}
 
 	void VulkanLoader::createSemaphores()
@@ -134,12 +140,39 @@ namespace Ly
 		m_semaphores = std::make_unique<Ly::Semaphores>(m_device->get());
 	}
 
+	void VulkanLoader::recreateSwapChain()
+	{
+		int width, height;
+		glfwGetWindowSize(m_window->m_window, &width, &height);
+		if (width == 0 || height == 0) return;
+
+		waitIdle();
+
+		cleanupSwapChain();
+
+		createSwapChain();
+		createImageViews();
+		createRenderPass();
+		createPipelineLayout();
+		createGraphicsPipeline();
+		createFramebuffers();
+		createCommandBuffers();
+	}
+
 	void VulkanLoader::drawFrame()
 	{
-		
 		uint32_t imageIndex;
-		vkAcquireNextImageKHR(m_device->get(), m_swapChain->get(), std::numeric_limits<uint64_t>::max(), 
-			m_semaphores->getImageAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
+		VkResult result = vkAcquireNextImageKHR(m_device->get(), m_swapChain->get(), 
+			std::numeric_limits<uint64_t>::max(), m_semaphores->getImageAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
+
+		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+			recreateSwapChain();
+			return;
+		}
+		else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+			Ly::Log::error("Failed to acquire swap chain image!");
+		}
+
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -148,6 +181,7 @@ namespace Ly
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
 		submitInfo.pWaitDstStageMask = waitStages;
+
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &m_commandBuffers->get(imageIndex);
 
@@ -171,11 +205,15 @@ namespace Ly
 
 		presentInfo.pImageIndices = &imageIndex;
 
-		vkQueuePresentKHR(m_presentQueue, &presentInfo);
+		result = vkQueuePresentKHR(m_presentQueue, &presentInfo);
 
-		if (m_validationLayers->areEnabled()) {
-			vkQueueWaitIdle(m_presentQueue);
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+			recreateSwapChain();
 		}
+		else if (result != VK_SUCCESS) {
+			Ly::Log::error("Failed to present swap chain image!");
+		}
+
 	}
 
 	void VulkanLoader::waitIdle()
