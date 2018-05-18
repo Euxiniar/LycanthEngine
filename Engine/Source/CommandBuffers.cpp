@@ -1,7 +1,7 @@
 #include <CommandBuffers.h>
 
 namespace Ly {
-	CommandBuffers::CommandBuffers(VkDevice & device, VkCommandPool commandPool, 
+	CommandBuffers::CommandBuffers(VkDevice & device, VkCommandPool& commandPool, 
 		std::vector<VkFramebuffer>& swapChainFramebuffers, 
 		VkPipeline & graphicsPipeline, VkRenderPass& renderPass,
 		VkExtent2D& swapChainExtent)
@@ -10,6 +10,7 @@ namespace Ly {
 		m_graphicsPipeline(graphicsPipeline),
 		m_renderPass(renderPass), m_swapChainExtent(swapChainExtent)
 	{
+		create();
 	}
 
 	CommandBuffers::~CommandBuffers()
@@ -20,6 +21,12 @@ namespace Ly {
 	{
 		return m_swapChainFramebuffers;
 	}
+
+	VkCommandBuffer & CommandBuffers::get(uint32_t indice)
+	{
+		return m_commandBuffers[indice];
+	}
+
 	void CommandBuffers::create()
 	{
 		m_commandBuffers.resize(m_swapChainFramebuffers.size());

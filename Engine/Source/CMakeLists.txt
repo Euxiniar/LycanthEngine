@@ -39,6 +39,8 @@ set(BASE
 	${DIR}/CommandPool.cpp
 	${DIR}/CommandBuffers.h
 	${DIR}/CommandBuffers.cpp
+	${DIR}/Semaphores.h
+	${DIR}/Semaphores.cpp
     PARENT_SCOPE
 )
 

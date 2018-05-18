@@ -27,6 +27,8 @@ namespace Ly {
 		VkFormat& swapChainImageFormat,
 		VkExtent2D& swapChainExtent);
 		~Swapchain();
+		VkSwapchainKHR& get();
+
 		static SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
 
 	private:

@@ -18,6 +18,7 @@
 #include <Framebuffers.h>
 #include <CommandPool.h>
 #include <CommandBuffers.h>
+#include <Semaphores.h>
 
 #include <memory>
 #include <vector>
@@ -30,6 +31,9 @@ namespace Ly {
 	public:
 		VulkanLoader(std::unique_ptr<Window>& window);
 		~VulkanLoader();
+
+		void drawFrame();
+		void waitIdle();
 
 	private:
 		void initVulkan();
@@ -47,6 +51,7 @@ namespace Ly {
 		void createFramebuffers();
 		void createCommandPool();
 		void createCommandBuffers();
+		void createSemaphores();
 
 		const std::vector<const char*> m_deviceExtensions = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -74,5 +79,6 @@ namespace Ly {
 		std::unique_ptr<Ly::Framebuffers> m_swapChainFramebuffers;
 		std::unique_ptr<Ly::CommandPool> m_commandPool;
 		std::unique_ptr<Ly::CommandBuffers> m_commandBuffers;
+		std::unique_ptr<Ly::Semaphores> m_semaphores;
 	};
 }

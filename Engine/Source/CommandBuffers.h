@@ -6,12 +6,13 @@
 namespace Ly {
 	class CommandBuffers {
 	public:
-		CommandBuffers(VkDevice& device, VkCommandPool commandPool, 
+		CommandBuffers(VkDevice& device, VkCommandPool& commandPool, 
 			std::vector<VkFramebuffer>& swapChainFramebuffers, VkPipeline& graphicsPipeline,
 			VkRenderPass& renderPass,
 			VkExtent2D& swapChainExtent);
 		~CommandBuffers();
 		std::vector<VkFramebuffer>& get();
+		VkCommandBuffer& get(uint32_t indice);
 
 	private:
 		std::vector<VkCommandBuffer> m_commandBuffers;

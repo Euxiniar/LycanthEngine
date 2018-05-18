@@ -10,6 +10,7 @@ namespace Ly
 
 	VulkanLoader::~VulkanLoader()
 	{
+		m_semaphores.reset();
 		m_commandPool.reset();
 		m_swapChainFramebuffers.reset();
 		m_graphicsPipeline.reset();
@@ -38,6 +39,10 @@ namespace Ly
 		createRenderPass();
 		createPipelineLayout();
 		createGraphicsPipeline();
+		createFramebuffers();
+		createCommandPool();
+		createCommandBuffers();
+		createSemaphores();
 	}
 
 	void VulkanLoader::createValidationLayers()
@@ -120,7 +125,61 @@ namespace Ly
 
 	void VulkanLoader::createCommandBuffers()
 	{
-		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(m_device->get(), m_commandPool->get(), 
-			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent);
+		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(CommandBuffers(m_device->get(), m_commandPool->get(), 
+			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent));
+	}
+
+	void VulkanLoader::createSemaphores()
+	{
+		m_semaphores = std::make_unique<Ly::Semaphores>(m_device->get());
+	}
+
+	void VulkanLoader::drawFrame()
+	{
+		
+		uint32_t imageIndex;
+		vkAcquireNextImageKHR(m_device->get(), m_swapChain->get(), std::numeric_limits<uint64_t>::max(), 
+			m_semaphores->getImageAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
+		VkSubmitInfo submitInfo = {};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+		VkSemaphore waitSemaphores[] = { m_semaphores->getImageAvailableSemaphore() };
+		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+		submitInfo.waitSemaphoreCount = 1;
+		submitInfo.pWaitSemaphores = waitSemaphores;
+		submitInfo.pWaitDstStageMask = waitStages;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &m_commandBuffers->get(imageIndex);
+
+		VkSemaphore signalSemaphores[] = { m_semaphores->getRenderFinishedSemaphore() };
+		submitInfo.signalSemaphoreCount = 1;
+		submitInfo.pSignalSemaphores = signalSemaphores;
+
+		if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) {
+			Ly::Log::error("Failed to submit draw command buffer!");
+		}
+
+		VkPresentInfoKHR presentInfo = {};
+		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+		presentInfo.waitSemaphoreCount = 1;
+		presentInfo.pWaitSemaphores = signalSemaphores;
+
+		VkSwapchainKHR swapChains[] = { m_swapChain->get() };
+		presentInfo.swapchainCount = 1;
+		presentInfo.pSwapchains = swapChains;
+
+		presentInfo.pImageIndices = &imageIndex;
+
+		vkQueuePresentKHR(m_presentQueue, &presentInfo);
+
+		if (m_validationLayers->areEnabled()) {
+			vkQueueWaitIdle(m_presentQueue);
+		}
+	}
+
+	void VulkanLoader::waitIdle()
+	{
+		vkDeviceWaitIdle(m_device->get());
 	}
 }

@@ -22,6 +22,11 @@ namespace Ly {
 		vkDestroySwapchainKHR(m_device, m_swapChain, nullptr);
 	}
 
+	VkSwapchainKHR & Swapchain::get()
+	{
+		return m_swapChain;
+	}
+
 	SwapChainSupportDetails Swapchain::querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface)
 	{
 		SwapChainSupportDetails details;

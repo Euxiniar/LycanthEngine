@@ -42,7 +42,9 @@ namespace Ly
 	{
 		while (!m_window->shouldClose()) {
 			m_window->poolEvents();
+			m_vulkanLoader->drawFrame();
 		}
+		m_vulkanLoader->waitIdle();
 	}
 
 	void Renderer::cleanup()
