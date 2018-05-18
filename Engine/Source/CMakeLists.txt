@@ -35,6 +35,8 @@ set(BASE
 	${DIR}/GraphicsPipeline.cpp
 	${DIR}/Framebuffers.h
 	${DIR}/Framebuffers.cpp
+	${DIR}/CommandPool.h
+	${DIR}/CommandPool.cpp
     PARENT_SCOPE
 )
 

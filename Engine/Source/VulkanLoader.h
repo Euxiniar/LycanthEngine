@@ -16,6 +16,7 @@
 #include <GraphicsPipeline.h>
 #include <RenderPass.h>
 #include <Framebuffers.h>
+#include <CommandPool.h>
 
 #include <memory>
 #include <vector>
@@ -43,6 +44,7 @@ namespace Ly {
 		void createPipelineLayout();
 		void createGraphicsPipeline();
 		void createFramebuffers();
+		void createCommandPool();
 
 		const std::vector<const char*> m_deviceExtensions = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -68,5 +70,6 @@ namespace Ly {
 		std::unique_ptr<Ly::GraphicsPipeline> m_graphicsPipeline;
 		std::unique_ptr<Ly::RenderPass> m_renderPass;
 		std::unique_ptr<Ly::Framebuffers> m_swapChainFramebuffers;
+		std::unique_ptr<Ly::CommandPool> m_commandPool;
 	};
 }

@@ -105,6 +105,11 @@ namespace Ly
 		m_swapChainFramebuffers = std::make_unique<Ly::Framebuffers>(m_device->get(), m_swapChainImageViews->get(), m_renderPass->get(), m_swapChainExtent);
 	}
 
+	void VulkanLoader::createCommandPool()
+	{
+		m_commandPool = std::make_unique<Ly::CommandPool>(m_device->get(), m_physicalDevice->get(), m_surface);
+	}
+
 	void VulkanLoader::createRenderPass()
 	{
 		m_renderPass = std::make_unique<Ly::RenderPass>(m_device->get(), m_swapChainImageFormat);
