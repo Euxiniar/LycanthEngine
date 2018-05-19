@@ -19,6 +19,8 @@
 #include <CommandPool.h>
 #include <CommandBuffers.h>
 #include <Semaphores.h>
+#include <Vertex.hpp>
+#include <VertexBuffer.h>
 
 #include <memory>
 #include <vector>
@@ -50,6 +52,7 @@ namespace Ly {
 		void createGraphicsPipeline();
 		void createFramebuffers();
 		void createCommandPool();
+		void createVertexBuffer();
 		void createCommandBuffers();
 		void createSemaphores();
 
@@ -58,6 +61,12 @@ namespace Ly {
 
 		const std::vector<const char*> m_deviceExtensions = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
+		};
+
+		const std::vector<Vertex> m_vertices = {
+			{ { 0.0f, -0.5f },{ 1.0f, 0.0f, 0.0f } },
+			{ { 0.5f, 0.5f },{ 0.0f, 1.0f, 0.0f } },
+			{ { -0.5f, 0.5f },{ 0.0f, 0.0f, 1.0f } }
 		};
 
 		std::unique_ptr<Ly::Window>& m_window;
@@ -81,6 +90,7 @@ namespace Ly {
 		std::unique_ptr<Ly::RenderPass> m_renderPass;
 		std::unique_ptr<Ly::Framebuffers> m_swapChainFramebuffers;
 		std::unique_ptr<Ly::CommandPool> m_commandPool;
+		std::unique_ptr<Ly::VertexBuffer> m_vertexBuffer;
 		std::unique_ptr<Ly::CommandBuffers> m_commandBuffers;
 		std::unique_ptr<Ly::Semaphores> m_semaphores;
 	};

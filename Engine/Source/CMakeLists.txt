@@ -41,6 +41,9 @@ set(BASE
 	${DIR}/CommandBuffers.cpp
 	${DIR}/Semaphores.h
 	${DIR}/Semaphores.cpp
+	${DIR}/VertexBuffer.h
+	${DIR}/VertexBuffer.cpp
+	${DIR}/Vertex.hpp
     PARENT_SCOPE
 )
 
