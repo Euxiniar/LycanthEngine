@@ -214,6 +214,9 @@ namespace Ly
 			Ly::Log::error("Failed to present swap chain image!");
 		}
 
+		if (m_validationLayers->areEnabled()) {
+			vkQueueWaitIdle(m_presentQueue);
+		}
 	}
 
 	void VulkanLoader::waitIdle()
