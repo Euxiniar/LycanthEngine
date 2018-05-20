@@ -27,9 +27,8 @@ namespace Ly {
 		poolInfo.flags = 0;
 
 		if (vkCreateCommandPool(m_device, &poolInfo, nullptr, &m_commandPool) != VK_SUCCESS) {
-			Ly::Log::error ("Failed to create command pool!");
+			Ly::Log::error("Failed to create command pool!");
 		}
-
 	}
 
 }
