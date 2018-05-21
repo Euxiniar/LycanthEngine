@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <Window.h>
 #include <QueueFamily.h>
+#include <memory>
 
 namespace Ly {
 	struct SwapChainSupportDetails {
