@@ -43,6 +43,8 @@ set(BASE
 	${DIR}/Semaphores.cpp
 	${DIR}/VertexBuffer.h
 	${DIR}/VertexBuffer.cpp
+	${DIR}/Buffer.h
+	${DIR}/Buffer.cpp
 	${DIR}/Vertex.hpp
     PARENT_SCOPE
 )
