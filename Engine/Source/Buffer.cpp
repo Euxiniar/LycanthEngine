@@ -18,7 +18,7 @@ namespace Ly {
 	}
 
 	void Buffer::create(VkDeviceSize size, VkBufferUsageFlags usage, 
-		VkMemoryPropertyFlags properties)
+		VkMemoryPropertyFlags properties, VkBuffer buffer, VkDeviceMemory bufferMemory)
 	{
 		VkBufferCreateInfo bufferInfo = {};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -26,23 +26,28 @@ namespace Ly {
 		bufferInfo.usage = usage;
 		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		if (vkCreateBuffer(m_device, &bufferInfo, nullptr, &m_buffer) != VK_SUCCESS) {
+		if (vkCreateBuffer(m_device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
 			Ly::Log::error("Failed to create buffer!");
 		}
 
 		VkMemoryRequirements memRequirements;
-		vkGetBufferMemoryRequirements(m_device, m_buffer, &memRequirements);
+		vkGetBufferMemoryRequirements(m_device, buffer, &memRequirements);
 
 		VkMemoryAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		allocInfo.allocationSize = memRequirements.size;
 		allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
-		if (vkAllocateMemory(m_device, &allocInfo, nullptr, &m_bufferMemory) != VK_SUCCESS) {
+		if (vkAllocateMemory(m_device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
 			Ly::Log::error("Failed to allocate buffer memory!");
 		}
 
-		vkBindBufferMemory(m_device, m_buffer, m_bufferMemory, 0);
+		vkBindBufferMemory(m_device, buffer, bufferMemory, 0);
+	}
+
+	void Buffer::create(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
+	{
+		create(size, usage, properties, m_buffer, m_bufferMemory);
 	}
 
 	uint32_t Buffer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
