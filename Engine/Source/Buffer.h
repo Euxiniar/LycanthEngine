@@ -14,7 +14,7 @@ namespace Ly {
 		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	protected:
-		void create(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer buffer, VkDeviceMemory bufferMemory);
+		void create(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
 		void create(VkDeviceSize size, VkBufferUsageFlags usage,
 			VkMemoryPropertyFlags properties);
