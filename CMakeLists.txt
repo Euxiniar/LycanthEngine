@@ -48,11 +48,14 @@ add_library(${ENGINE} STATIC
 	${SHADERS}
 )
 
+
 source_group( Shaders FILES ${SHADERS})
 
 source_group( Engine FILES ${BASE})
 source_group( Utils FILES ${UTILS})
 source_group( CMake FILES ${CMAKE_TEXT})
+
+add_dependencies (${PROJECT} ${ENGINE})
 
 #----------------------Links Project----------------------#
 
@@ -87,9 +90,6 @@ if(WIN32)
 endif(WIN32)
 
 
-add_custom_command(TARGET ${PROJECT} PRE_BUILD 
-COMMAND cmd /c ${CMAKE_SOURCE_DIR}/Data/Shaders/compile.bat)
-
 add_custom_command(TARGET ${PROJECT} PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
 	${CMAKE_SOURCE_DIR}/Data ./Data)
@@ -101,3 +101,6 @@ add_custom_command(TARGET ${PROJECT} PRE_BUILD
 add_custom_command(TARGET ${PROJECT} PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_SOURCE_DIR}/Data ${CMAKE_BINARY_DIR}/Release/Data)
+
+add_custom_command(TARGET ${PROJECT} PRE_BUILD 
+	COMMAND cmd /c ${CMAKE_SOURCE_DIR}/Data/Shaders/compile.bat)

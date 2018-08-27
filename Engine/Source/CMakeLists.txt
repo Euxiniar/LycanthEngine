@@ -39,8 +39,8 @@ set(BASE
 	${DIR}/CommandPool.cpp
 	${DIR}/CommandBuffers.h
 	${DIR}/CommandBuffers.cpp
-	${DIR}/Semaphores.h
-	${DIR}/Semaphores.cpp
+	${DIR}/SyncObject.h
+	${DIR}/SyncObject.cpp
     PARENT_SCOPE
 )
 

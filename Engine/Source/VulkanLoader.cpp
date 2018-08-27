@@ -10,7 +10,10 @@ namespace Ly
 
 	VulkanLoader::~VulkanLoader()
 	{
-		m_semaphores.reset();
+		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
+			m_semaphores.at(i).reset();
+		}
+		m_commandBuffers.reset();
 		m_commandPool.reset();
 		m_swapChainFramebuffers.reset();
 		m_graphicsPipeline.reset();
@@ -125,25 +128,28 @@ namespace Ly
 
 	void VulkanLoader::createCommandBuffers()
 	{
-		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(CommandBuffers(m_device->get(), m_commandPool->get(), 
-			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent));
+		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(m_device->get(), m_commandPool->get(), 
+			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent);
 	}
 
 	void VulkanLoader::createSemaphores()
 	{
-		m_semaphores = std::make_unique<Ly::Semaphores>(m_device->get());
+		for(int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		m_semaphores.push_back(std::make_unique<Ly::SyncObject>(m_device->get()));
 	}
 
 	void VulkanLoader::drawFrame()
 	{
-		
+		vkWaitForFences(m_device->get(), 1, &m_semaphores.at(currentFrame)->getInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
+		vkResetFences(m_device->get(), 1, &m_semaphores.at(currentFrame)->getInFlightFence());
+
 		uint32_t imageIndex;
 		vkAcquireNextImageKHR(m_device->get(), m_swapChain->get(), std::numeric_limits<uint64_t>::max(), 
-			m_semaphores->getImageAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
+			m_semaphores.at(currentFrame)->getImageAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-		VkSemaphore waitSemaphores[] = { m_semaphores->getImageAvailableSemaphore() };
+		VkSemaphore waitSemaphores[] = { m_semaphores.at(currentFrame)->getImageAvailableSemaphore() };
 		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
@@ -151,11 +157,11 @@ namespace Ly
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &m_commandBuffers->get(imageIndex);
 
-		VkSemaphore signalSemaphores[] = { m_semaphores->getRenderFinishedSemaphore() };
+		VkSemaphore signalSemaphores[] = { m_semaphores.at(currentFrame)->getRenderFinishedSemaphore() };
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) {
+		if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, m_semaphores.at(currentFrame)->getInFlightFence()) != VK_SUCCESS) {
 			Ly::Log::error("Failed to submit draw command buffer!");
 		}
 
@@ -173,9 +179,7 @@ namespace Ly
 
 		vkQueuePresentKHR(m_presentQueue, &presentInfo);
 
-		if (m_validationLayers->areEnabled()) {
-			vkQueueWaitIdle(m_presentQueue);
-		}
+		currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 	}
 
 	void VulkanLoader::waitIdle()

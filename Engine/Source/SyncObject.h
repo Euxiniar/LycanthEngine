@@ -3,12 +3,13 @@
 #include <Utils/Log.h>
 
 namespace Ly {
-	class Semaphores {
+	class SyncObject {
 	public:
-		Semaphores(VkDevice& device);
-		~Semaphores();
+		SyncObject(VkDevice& device);
+		~SyncObject();
 		VkSemaphore& getImageAvailableSemaphore();
 		VkSemaphore& getRenderFinishedSemaphore();
+		VkFence& getInFlightFence();
 		
 	private:
 		VkDevice & m_device;
@@ -16,5 +17,7 @@ namespace Ly {
 
 		VkSemaphore m_imageAvailableSemaphore;
 		VkSemaphore m_renderFinishedSemaphore;
+
+		VkFence inFlightFence;
 	};
 }

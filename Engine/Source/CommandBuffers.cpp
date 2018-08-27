@@ -15,11 +15,12 @@ namespace Ly {
 
 	CommandBuffers::~CommandBuffers()
 	{
+		vkFreeCommandBuffers(m_device, m_commandPool, static_cast<uint32_t>(m_commandBuffers.size()), m_commandBuffers.data());
 	}
 
-	std::vector<VkFramebuffer>& CommandBuffers::get()
+	std::vector<VkCommandBuffer>& CommandBuffers::get()
 	{
-		return m_swapChainFramebuffers;
+		return m_commandBuffers;
 	}
 
 	VkCommandBuffer & CommandBuffers::get(uint32_t indice)

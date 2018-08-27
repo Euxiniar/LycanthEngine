@@ -18,7 +18,7 @@
 #include <Framebuffers.h>
 #include <CommandPool.h>
 #include <CommandBuffers.h>
-#include <Semaphores.h>
+#include <SyncObject.h>
 
 #include <memory>
 #include <vector>
@@ -57,6 +57,9 @@ namespace Ly {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
 		};
 
+		const int MAX_FRAMES_IN_FLIGHT = 2;
+		size_t currentFrame = 0;
+
 		std::unique_ptr<Ly::Window>& m_window;
 		std::unique_ptr<Ly::Instance> m_instance;
 		std::unique_ptr<Ly::ValidationLayers> m_validationLayers;
@@ -79,6 +82,6 @@ namespace Ly {
 		std::unique_ptr<Ly::Framebuffers> m_swapChainFramebuffers;
 		std::unique_ptr<Ly::CommandPool> m_commandPool;
 		std::unique_ptr<Ly::CommandBuffers> m_commandBuffers;
-		std::unique_ptr<Ly::Semaphores> m_semaphores;
+		std::vector<std::unique_ptr<Ly::SyncObject>> m_semaphores;
 	};
 }
