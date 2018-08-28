@@ -13,6 +13,7 @@ set(BASE
 	${DIR}/Framebuffers.cpp
 	${DIR}/CommandBuffers.h
 	${DIR}/CommandBuffers.cpp
+	${DIR}/Vertex.hpp
     PARENT_SCOPE
 )
 
@@ -103,6 +104,18 @@ set(GRAPHICS_PIPELINE
 set(PIPELINE_LAYOUT
 	${DIR}/PipelineLayout.h
 	${DIR}/PipelineLayout.cpp
+    PARENT_SCOPE
+)
+
+set(BUFFER
+	${DIR}/Buffer.h
+	${DIR}/Buffer.cpp
+    PARENT_SCOPE
+)
+
+set(VERTEX_BUFFER
+	${DIR}/VertexBuffer.h
+	${DIR}/VertexBuffer.cpp
     PARENT_SCOPE
 )
 

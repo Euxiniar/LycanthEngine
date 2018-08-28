@@ -9,7 +9,8 @@ namespace Ly {
 		CommandBuffers(VkDevice& device, VkCommandPool& commandPool, 
 			std::vector<VkFramebuffer>& swapChainFramebuffers, VkPipeline& graphicsPipeline,
 			VkRenderPass& renderPass,
-			VkExtent2D& swapChainExtent);
+			VkExtent2D& swapChainExtent,
+			VkBuffer& vertexBuffer);
 		~CommandBuffers();
 		std::vector<VkCommandBuffer>& get();
 		VkCommandBuffer& get(uint32_t indice);
@@ -23,6 +24,7 @@ namespace Ly {
 		VkCommandPool& m_commandPool;
 		VkRenderPass& m_renderPass;
 		VkExtent2D& m_swapChainExtent;
+		VkBuffer& m_vertexBuffer;
 
 		void create();
 	};

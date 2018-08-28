@@ -5,6 +5,7 @@
 #include <fstream>
 #include <memory>
 #include <vector>
+#include <Vertex.hpp>
 
 namespace Ly {
 	class GraphicsPipeline {

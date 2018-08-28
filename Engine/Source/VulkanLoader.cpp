@@ -12,6 +12,8 @@ namespace Ly
 	{
 		cleanupSwapChain();
 
+		m_vertexBuffer.reset();
+
 		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
 			m_syncObjects.at(i).reset();
 		}
@@ -74,6 +76,7 @@ namespace Ly
 		createGraphicsPipeline();
 		createFramebuffers();
 		createCommandPool();
+		createVertexBuffer();
 		createCommandBuffers();
 		createSyncObjects();
 	}
@@ -156,10 +159,17 @@ namespace Ly
 		m_commandPool = std::make_unique<Ly::CommandPool>(m_device->get(), m_physicalDevice->get(), m_surface);
 	}
 
+	void VulkanLoader::createVertexBuffer()
+	{
+		m_vertexBuffer = std::make_unique<Ly::VertexBuffer>(m_device->get(),
+			m_physicalDevice->get(), sizeof(m_vertices[0]) * m_vertices.size(), (void *) m_vertices.data());
+	}
+
 	void VulkanLoader::createCommandBuffers()
 	{
 		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(m_device->get(), m_commandPool->get(), 
-			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent);
+			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent,
+			m_vertexBuffer->get());
 	}
 
 	void VulkanLoader::createSyncObjects()

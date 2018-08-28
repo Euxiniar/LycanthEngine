@@ -60,6 +60,8 @@ add_library(${ENGINE} STATIC
 	${QUEUE_FAMILY}
 	${GRAPHICS_PIPELINE}
 	${PIPELINE_LAYOUT}
+	${BUFFER}
+	${VERTEX_BUFFER}
 )
 
 source_group( Shaders FILES ${SHADERS})
@@ -80,6 +82,9 @@ source_group( Engine\\Render_Pass FILES ${RENDER_PASS})
 source_group( Engine\\Queue_Family FILES ${QUEUE_FAMILY})
 source_group( Engine\\Graphics_Pipeline FILES ${GRAPHICS_PIPELINE})
 source_group( Engine\\Pipeline_Layout FILES ${PIPELINE_LAYOUT})
+source_group( Engine\\Buffer FILES ${BUFFER})
+source_group( Engine\\Vertex_Buffer FILES ${VERTEX_BUFFER})
+
 
 
 source_group( CMake FILES ${CMAKE_TEXT})
