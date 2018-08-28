@@ -10,23 +10,53 @@ namespace Ly
 
 	VulkanLoader::~VulkanLoader()
 	{
+		cleanupSwapChain();
+
 		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
-			m_semaphores.at(i).reset();
+			m_syncObjects.at(i).reset();
 		}
-		m_commandBuffers.reset();
 		m_commandPool.reset();
-		m_swapChainFramebuffers.reset();
-		m_graphicsPipeline.reset();
-		m_pipelineLayout.reset();
-		m_renderPass.reset();
-		m_swapChainImageViews.reset();
-		m_swapChain.reset();
 		m_device.reset();
+
 		if (Ly::ValidationLayers::areEnabled()) {
 			m_callback.reset();
 		}
 		vkDestroySurfaceKHR(m_instance->get(), m_surface, nullptr);
 		m_instance.reset();
+	}
+
+	void VulkanLoader::cleanupSwapChain()
+	{
+		m_swapChainFramebuffers.reset();
+		m_commandBuffers.reset();
+		m_graphicsPipeline.reset();
+		m_pipelineLayout.reset();
+		m_renderPass.reset();
+		m_swapChainImageViews.reset();
+		m_swapChain.reset();
+	}
+
+	void VulkanLoader::recreateSwapchain()
+	{
+		int width = 0, height = 0;
+		while (width == 0 || height == 0) {
+			m_window->updateWindowSize();
+			width = m_window->m_width;
+			height = m_window->m_height;
+			glfwWaitEvents();
+		}
+
+		vkDeviceWaitIdle(m_device->get());
+
+		cleanupSwapChain();
+
+		createSwapChain();
+		createImageViews();
+		createRenderPass();
+		createPipelineLayout();
+		createGraphicsPipeline();
+		createFramebuffers();
+		createCommandBuffers();
 	}
 
 	void VulkanLoader::initVulkan()
@@ -45,7 +75,7 @@ namespace Ly
 		createFramebuffers();
 		createCommandPool();
 		createCommandBuffers();
-		createSemaphores();
+		createSyncObjects();
 	}
 
 	void VulkanLoader::createValidationLayers()
@@ -132,24 +162,32 @@ namespace Ly
 			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent);
 	}
 
-	void VulkanLoader::createSemaphores()
+	void VulkanLoader::createSyncObjects()
 	{
 		for(int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-		m_semaphores.push_back(std::make_unique<Ly::SyncObject>(m_device->get()));
+		m_syncObjects.push_back(std::make_unique<Ly::SyncObject>(m_device->get()));
 	}
 
 	void VulkanLoader::drawFrame()
 	{
-		vkWaitForFences(m_device->get(), 1, &m_semaphores.at(currentFrame)->getInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
-		vkResetFences(m_device->get(), 1, &m_semaphores.at(currentFrame)->getInFlightFence());
+		vkWaitForFences(m_device->get(), 1, &m_syncObjects.at(currentFrame)->getInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
 
 		uint32_t imageIndex;
-		vkAcquireNextImageKHR(m_device->get(), m_swapChain->get(), std::numeric_limits<uint64_t>::max(), 
-			m_semaphores.at(currentFrame)->getImageAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
+		VkResult result = vkAcquireNextImageKHR(m_device->get(), m_swapChain->get(), std::numeric_limits<uint64_t>::max(), 
+			m_syncObjects.at(currentFrame)->getImageAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
+
+		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+			recreateSwapchain();
+			return;
+		}
+		else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+			Ly::Log::error("Failed to acquire swap chain image !");
+		}
+
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-		VkSemaphore waitSemaphores[] = { m_semaphores.at(currentFrame)->getImageAvailableSemaphore() };
+		VkSemaphore waitSemaphores[] = { m_syncObjects.at(currentFrame)->getImageAvailableSemaphore() };
 		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
@@ -157,11 +195,13 @@ namespace Ly
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &m_commandBuffers->get(imageIndex);
 
-		VkSemaphore signalSemaphores[] = { m_semaphores.at(currentFrame)->getRenderFinishedSemaphore() };
+		VkSemaphore signalSemaphores[] = { m_syncObjects.at(currentFrame)->getRenderFinishedSemaphore() };
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, m_semaphores.at(currentFrame)->getInFlightFence()) != VK_SUCCESS) {
+		vkResetFences(m_device->get(), 1, &m_syncObjects.at(currentFrame)->getInFlightFence());
+
+		if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, m_syncObjects.at(currentFrame)->getInFlightFence()) != VK_SUCCESS) {
 			Ly::Log::error("Failed to submit draw command buffer!");
 		}
 
@@ -177,7 +217,15 @@ namespace Ly
 
 		presentInfo.pImageIndices = &imageIndex;
 
-		vkQueuePresentKHR(m_presentQueue, &presentInfo);
+		result = vkQueuePresentKHR(m_presentQueue, &presentInfo);
+
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+			framebufferResized = false;
+			recreateSwapchain();
+		}
+		else if (result != VK_SUCCESS) {
+			Ly::Log::error("Failed to present swap chain image!");
+		}
 
 		currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 	}

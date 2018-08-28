@@ -51,19 +51,22 @@ namespace Ly {
 		void createFramebuffers();
 		void createCommandPool();
 		void createCommandBuffers();
-		void createSemaphores();
+		void createSyncObjects();
+		void recreateSwapchain();
+		void cleanupSwapChain();
 
 		const std::vector<const char*> m_deviceExtensions = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
 		};
 
-		const int MAX_FRAMES_IN_FLIGHT = 2;
+		const int MAX_FRAMES_IN_FLIGHT = 3;
 		size_t currentFrame = 0;
+		bool framebufferResized = false;
 
 		std::unique_ptr<Ly::Window>& m_window;
 		std::unique_ptr<Ly::Instance> m_instance;
 		std::unique_ptr<Ly::ValidationLayers> m_validationLayers;
-		std::string m_appName = "Vulkan";
+		std::string m_appName = "Triangle";
 		std::string m_engineName = "LycanthEngine";
 		std::unique_ptr<Ly::DebugCallback> m_callback;
 		VkSurfaceKHR m_surface;
@@ -82,6 +85,6 @@ namespace Ly {
 		std::unique_ptr<Ly::Framebuffers> m_swapChainFramebuffers;
 		std::unique_ptr<Ly::CommandPool> m_commandPool;
 		std::unique_ptr<Ly::CommandBuffers> m_commandBuffers;
-		std::vector<std::unique_ptr<Ly::SyncObject>> m_semaphores;
+		std::vector<std::unique_ptr<Ly::SyncObject>> m_syncObjects;
 	};
 }

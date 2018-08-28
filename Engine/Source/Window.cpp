@@ -24,6 +24,11 @@ namespace Ly
 		glfwPollEvents();
 	}
 
+	void Window::updateWindowSize()
+	{
+		glfwGetFramebufferSize(m_window, &m_width, &m_height);
+	}
+
 	void Window::create()
 	{
 		glfwInit();

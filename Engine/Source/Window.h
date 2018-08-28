@@ -12,6 +12,7 @@ namespace Ly {
 		~Window();
 		bool shouldClose();
 		void poolEvents();
+		void updateWindowSize();
 
 		GLFWwindow* m_window;
 		int m_width = 800;
