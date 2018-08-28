@@ -2,7 +2,7 @@
 
 namespace Ly 
 {
-	static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+	static void framebufferResizeCallback(GLFWwindow* window, int, int) {
 		auto app = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 		app->framebufferResized = true;
 	}
