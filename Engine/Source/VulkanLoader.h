@@ -59,9 +59,8 @@ namespace Ly {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
 		};
 
-		const int MAX_FRAMES_IN_FLIGHT = 3;
+		const int MAX_FRAMES_IN_FLIGHT = 2;
 		size_t currentFrame = 0;
-		bool framebufferResized = false;
 
 		std::unique_ptr<Ly::Window>& m_window;
 		std::unique_ptr<Ly::Instance> m_instance;

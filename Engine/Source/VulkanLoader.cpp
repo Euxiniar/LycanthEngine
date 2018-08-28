@@ -219,8 +219,8 @@ namespace Ly
 
 		result = vkQueuePresentKHR(m_presentQueue, &presentInfo);
 
-		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
-			framebufferResized = false;
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window->framebufferResized) {
+			m_window->framebufferResized = false;
 			recreateSwapchain();
 		}
 		else if (result != VK_SUCCESS) {
