@@ -2,6 +2,11 @@
 
 namespace Ly 
 {
+	static void framebufferResizeCallback(GLFWwindow* window, int, int) {
+		auto app = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+		app->framebufferResized = true;
+	}
+
 	Window::Window(std::string title, int width, int height)
 		: m_title(title), m_width(width), m_height(height)
 	{
@@ -24,13 +29,20 @@ namespace Ly
 		glfwPollEvents();
 	}
 
+	void Window::updateWindowSize()
+	{
+		glfwGetFramebufferSize(m_window, &m_width, &m_height);
+	}
+
 	void Window::create()
 	{
 		glfwInit();
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 		
 		m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
+		glfwSetWindowUserPointer(m_window, this);
+		glfwSetFramebufferSizeCallback(m_window, framebufferResizeCallback);
 	}
 }

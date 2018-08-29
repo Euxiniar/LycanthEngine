@@ -1,7 +1,6 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include <Utils/Log.h>
-#include <Vertex.hpp>
 #include <vector>
 
 namespace Ly {
@@ -12,7 +11,8 @@ namespace Ly {
 			VkRenderPass& renderPass,
 			VkExtent2D& swapChainExtent,
 			VkBuffer& vertexBuffer,
-		const std::vector<Ly::Vertex>& vertices);
+			VkBuffer& indexBuffer,
+			uint32_t indicesSize);
 		~CommandBuffers();
 		std::vector<VkCommandBuffer>& get();
 		VkCommandBuffer& get(uint32_t indice);
@@ -27,7 +27,8 @@ namespace Ly {
 		VkRenderPass& m_renderPass;
 		VkExtent2D& m_swapChainExtent;
 		VkBuffer& m_vertexBuffer;
-		const std::vector<Ly::Vertex>& m_vertices;
+		VkBuffer& m_indexBuffer;
+		uint32_t m_indicesSize;
 
 		void create();
 	};

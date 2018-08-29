@@ -8,6 +8,31 @@ namespace Ly
 		initVulkan();
 	}
 
+	VulkanLoader::~VulkanLoader()
+	{
+		cleanupSwapChain();
+
+		m_indexBuffer.reset();
+		m_vertexBuffer.reset();
+
+		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
+			m_syncObjects.at(i).reset();
+		}
+
+		for (int i = 0; i < m_commandPools.size(); i++)
+		{
+			m_commandPools.at(i).reset();
+		}
+		
+		m_device.reset();
+
+		if (Ly::ValidationLayers::areEnabled()) {
+			m_callback.reset();
+		}
+		vkDestroySurfaceKHR(m_instance->get(), m_surface, nullptr);
+		m_instance.reset();
+	}
+
 	void VulkanLoader::cleanupSwapChain()
 	{
 		m_swapChainFramebuffers.reset();
@@ -19,19 +44,27 @@ namespace Ly
 		m_swapChain.reset();
 	}
 
-	VulkanLoader::~VulkanLoader()
+	void VulkanLoader::recreateSwapchain()
 	{
+		int width = 0, height = 0;
+		while (width == 0 || height == 0) {
+			m_window->updateWindowSize();
+			width = m_window->m_width;
+			height = m_window->m_height;
+			glfwWaitEvents();
+		}
+
+		vkDeviceWaitIdle(m_device->get());
+
 		cleanupSwapChain();
 
-		m_vertexBuffer.reset();
-		m_semaphores.reset();
-		m_commandPool.reset();
-		m_device.reset();
-		if (Ly::ValidationLayers::areEnabled()) {
-			m_callback.reset();
-		}
-		vkDestroySurfaceKHR(m_instance->get(), m_surface, nullptr);
-		m_instance.reset();
+		createSwapChain();
+		createImageViews();
+		createRenderPass();
+		createPipelineLayout();
+		createGraphicsPipeline();
+		createFramebuffers();
+		createCommandBuffers();
 	}
 
 	void VulkanLoader::initVulkan()
@@ -50,8 +83,9 @@ namespace Ly
 		createFramebuffers();
 		createCommandPool();
 		createVertexBuffer();
+		createIndexBuffer();
 		createCommandBuffers();
-		createSemaphores();
+		createSyncObjects();
 	}
 
 	void VulkanLoader::createValidationLayers()
@@ -90,7 +124,7 @@ namespace Ly
 	{
 		m_device = std::make_unique<Ly::LogicalDevice>(m_physicalDevice->get(), 
 			m_surface, m_validationLayers->get(), 
-			m_deviceExtensions, m_graphicsQueue, m_presentQueue);
+			m_deviceExtensions, m_graphicsQueue, m_presentQueue, m_transferQueue);
 	}
 
 	void VulkanLoader::createSwapChain()
@@ -129,75 +163,92 @@ namespace Ly
 
 	void VulkanLoader::createCommandPool()
 	{
-		m_commandPool = std::make_unique<Ly::CommandPool>(m_device->get(), m_physicalDevice->get(), m_surface);
+		QueueFamilyIndices queueFamilyIndices = QueueFamily::findQueueFamilies(m_physicalDevice->get(), m_surface);
+		m_commandPools.push_back(std::make_unique<Ly::CommandPool>(m_device->get(), queueFamilyIndices.graphicsFamily));
+		m_commandPools.push_back(std::make_unique<Ly::CommandPool>(m_device->get(), queueFamilyIndices.presentFamily));
 	}
 
 	void VulkanLoader::createVertexBuffer()
 	{
-		m_vertexBuffer = std::make_unique<Ly::VertexBuffer>(m_device->get(), m_physicalDevice->get(), m_vertices);
+		Ly::Buffer stagingBuffer(m_device->get(), m_physicalDevice->get(), sizeof(m_vertices[0]) * m_vertices.size(),
+			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+		void* data;
+		vkMapMemory(m_device->get(), stagingBuffer.getMemory(), 0, stagingBuffer.getSize(), 0, &data);
+		memcpy(data, m_vertices.data(), (size_t)stagingBuffer.getSize());
+		vkUnmapMemory(m_device->get(), stagingBuffer.getMemory());
+
+		m_vertexBuffer = std::make_unique<Ly::VertexBuffer>(m_device->get(),
+			m_physicalDevice->get(), stagingBuffer.getSize(), (void *) m_vertices.data());
+
+		copyBuffer(stagingBuffer.get(), m_vertexBuffer->get());
+	}
+
+	void VulkanLoader::createIndexBuffer()
+	{
+		Ly::Buffer stagingBuffer(m_device->get(), m_physicalDevice->get(), sizeof(m_indices[0]) * m_indices.size(),
+			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+		void* data;
+		vkMapMemory(m_device->get(), stagingBuffer.getMemory(), 0, stagingBuffer.getSize(), 0, &data);
+		memcpy(data, m_indices.data(), (size_t)stagingBuffer.getSize());
+		vkUnmapMemory(m_device->get(), stagingBuffer.getMemory());
+
+		m_indexBuffer = std::make_unique<Ly::IndexBuffer>(m_device->get(),
+			m_physicalDevice->get(), stagingBuffer.getSize());
+
+		copyBuffer(stagingBuffer.get(), m_indexBuffer->get());
 	}
 
 	void VulkanLoader::createCommandBuffers()
 	{
-		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(m_device->get(), m_commandPool->get(),
-			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent, m_vertexBuffer->get(), m_vertices);
+		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(m_device->get(), m_commandPools.at(0)->get(), 
+			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent,
+			m_vertexBuffer->get(), m_indexBuffer->get(), static_cast<uint32_t>(m_indices.size()));
 	}
 
-	void VulkanLoader::createSemaphores()
+	void VulkanLoader::createSyncObjects()
 	{
-		m_semaphores = std::make_unique<Ly::Semaphores>(m_device->get());
-	}
-
-	void VulkanLoader::recreateSwapChain()
-	{
-		int width, height;
-		glfwGetWindowSize(m_window->m_window, &width, &height);
-		if (width == 0 || height == 0) return;
-
-		waitIdle();
-
-		cleanupSwapChain();
-
-		createSwapChain();
-		createImageViews();
-		createRenderPass();
-		createPipelineLayout();
-		createGraphicsPipeline();
-		createFramebuffers();
-		createCommandBuffers();
+		for(int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		m_syncObjects.push_back(std::make_unique<Ly::SyncObject>(m_device->get()));
 	}
 
 	void VulkanLoader::drawFrame()
 	{
+		vkWaitForFences(m_device->get(), 1, &m_syncObjects.at(currentFrame)->getInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
+
 		uint32_t imageIndex;
-		VkResult result = vkAcquireNextImageKHR(m_device->get(), m_swapChain->get(), 
-			std::numeric_limits<uint64_t>::max(), m_semaphores->getImageAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
+		VkResult result = vkAcquireNextImageKHR(m_device->get(), m_swapChain->get(), std::numeric_limits<uint64_t>::max(), 
+			m_syncObjects.at(currentFrame)->getImageAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
 
 		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-			recreateSwapChain();
+			recreateSwapchain();
 			return;
 		}
 		else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-			Ly::Log::error("Failed to acquire swap chain image!");
+			Ly::Log::error("Failed to acquire swap chain image !");
 		}
 
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-		VkSemaphore waitSemaphores[] = { m_semaphores->getImageAvailableSemaphore() };
+		VkSemaphore waitSemaphores[] = { m_syncObjects.at(currentFrame)->getImageAvailableSemaphore() };
 		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
 		submitInfo.pWaitDstStageMask = waitStages;
-
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &m_commandBuffers->get(imageIndex);
 
-		VkSemaphore signalSemaphores[] = { m_semaphores->getRenderFinishedSemaphore() };
+		VkSemaphore signalSemaphores[] = { m_syncObjects.at(currentFrame)->getRenderFinishedSemaphore() };
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) {
+		vkResetFences(m_device->get(), 1, &m_syncObjects.at(currentFrame)->getInFlightFence());
+
+		if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, m_syncObjects.at(currentFrame)->getInFlightFence()) != VK_SUCCESS) {
 			Ly::Log::error("Failed to submit draw command buffer!");
 		}
 
@@ -215,20 +266,55 @@ namespace Ly
 
 		result = vkQueuePresentKHR(m_presentQueue, &presentInfo);
 
-		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
-			recreateSwapChain();
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window->framebufferResized) {
+			m_window->framebufferResized = false;
+			recreateSwapchain();
 		}
 		else if (result != VK_SUCCESS) {
 			Ly::Log::error("Failed to present swap chain image!");
 		}
 
-		if (m_validationLayers->areEnabled()) {
-			vkQueueWaitIdle(m_presentQueue);
-		}
+		currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 	}
 
 	void VulkanLoader::waitIdle()
 	{
 		vkDeviceWaitIdle(m_device->get());
+	}
+
+	void VulkanLoader::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer)
+	{
+		VkCommandBufferAllocateInfo allocInfo = {};
+		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		allocInfo.commandPool = m_commandPools.at(1)->get();
+		allocInfo.commandBufferCount = 1;
+
+		VkCommandBuffer commandBuffer;
+		vkAllocateCommandBuffers(m_device->get(), &allocInfo, &commandBuffer);
+
+		VkCommandBufferBeginInfo beginInfo = {};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+		vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+		VkBufferCopy copyRegion = {};
+		copyRegion.srcOffset = 0; 
+		copyRegion.dstOffset = 0; 
+		copyRegion.size = m_vertexBuffer->getSize();
+		vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+		vkEndCommandBuffer(commandBuffer);
+
+		VkSubmitInfo submitInfo = {};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &commandBuffer;
+
+		vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+		vkQueueWaitIdle(m_graphicsQueue);
+
+		vkFreeCommandBuffers(m_device->get(), m_commandPools.at(1)->get(), 1, &commandBuffer);
 	}
 }

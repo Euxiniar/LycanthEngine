@@ -24,7 +24,7 @@ namespace Ly {
 		createInfo.pCode = reinterpret_cast<const uint32_t*>(m_code.data());
 
 		if (vkCreateShaderModule(m_device, &createInfo, nullptr, &m_shaderModule) != VK_SUCCESS) {
-			Ly::Log::error("failed to create shader module!");
+			Ly::Log::error("Failed to create shader module!");
 		}
 	}
 }

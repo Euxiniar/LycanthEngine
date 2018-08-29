@@ -3,6 +3,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include <Vertex.hpp>
 #include <Window.h>
 #include <DebugCallback.h>
 #include <Instance.h>
@@ -18,9 +19,9 @@
 #include <Framebuffers.h>
 #include <CommandPool.h>
 #include <CommandBuffers.h>
-#include <Semaphores.h>
-#include <Vertex.hpp>
+#include <SyncObject.h>
 #include <VertexBuffer.h>
+#include <IndexBuffer.h>
 
 #include <memory>
 #include <vector>
@@ -52,27 +53,36 @@ namespace Ly {
 		void createGraphicsPipeline();
 		void createFramebuffers();
 		void createCommandPool();
-		void createVertexBuffer();
 		void createCommandBuffers();
-		void createSemaphores();
-
-		void recreateSwapChain();
+		void createSyncObjects();
+		void recreateSwapchain();
 		void cleanupSwapChain();
+		void createVertexBuffer();
+		void createIndexBuffer();
+		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer);
 
 		const std::vector<const char*> m_deviceExtensions = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
 		};
 
+		const int MAX_FRAMES_IN_FLIGHT = 2;
+		size_t currentFrame = 0;
+
 		const std::vector<Vertex> m_vertices = {
-			{ { 0.0f, -0.5f },{ 1.0f, 0.0f, 0.0f } },
-			{ { 0.5f, 0.5f },{ 0.0f, 1.0f, 0.0f } },
-			{ { -0.5f, 0.5f },{ 0.0f, 0.0f, 1.0f } }
+			{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+			{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+			{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+		};
+
+		const std::vector<uint16_t> m_indices = {
+			0, 1, 2, 2, 3, 0
 		};
 
 		std::unique_ptr<Ly::Window>& m_window;
 		std::unique_ptr<Ly::Instance> m_instance;
 		std::unique_ptr<Ly::ValidationLayers> m_validationLayers;
-		std::string m_appName = "Vulkan";
+		std::string m_appName = "Triangle";
 		std::string m_engineName = "LycanthEngine";
 		std::unique_ptr<Ly::DebugCallback> m_callback;
 		VkSurfaceKHR m_surface;
@@ -80,6 +90,7 @@ namespace Ly {
 		std::unique_ptr<Ly::LogicalDevice> m_device;
 		VkQueue m_graphicsQueue;
 		VkQueue m_presentQueue;
+		VkQueue m_transferQueue;
 		std::unique_ptr<Ly::Swapchain> m_swapChain;
 		std::vector<VkImage> m_swapChainImages;
 		VkFormat m_swapChainImageFormat;
@@ -89,9 +100,10 @@ namespace Ly {
 		std::unique_ptr<Ly::GraphicsPipeline> m_graphicsPipeline;
 		std::unique_ptr<Ly::RenderPass> m_renderPass;
 		std::unique_ptr<Ly::Framebuffers> m_swapChainFramebuffers;
-		std::unique_ptr<Ly::CommandPool> m_commandPool;
-		std::unique_ptr<Ly::VertexBuffer> m_vertexBuffer;
+		std::vector<std::unique_ptr<Ly::CommandPool>> m_commandPools;
 		std::unique_ptr<Ly::CommandBuffers> m_commandBuffers;
-		std::unique_ptr<Ly::Semaphores> m_semaphores;
+		std::unique_ptr<Ly::VertexBuffer> m_vertexBuffer;
+		std::unique_ptr<Ly::IndexBuffer> m_indexBuffer;
+		std::vector<std::unique_ptr<Ly::SyncObject>> m_syncObjects;
 	};
 }

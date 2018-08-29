@@ -43,16 +43,55 @@ set(SHADERS
 
 add_library(${ENGINE} STATIC
     ${BASE}
+	${RENDERER}
+	${WINDOW}
+	${INSTANCE}
+	${PHYSICAL_DEVICE}
+	${LOGICAL_DEVICE}
+	${COMMAND_POOL}
+	${VULKAN_LOADER}
 	${UTILS}
 	${CMAKE_TEXT}
 	${SHADERS}
+	${SWAPCHAIN}
+	${SYNC_OBJECT}
+	${SHADER_MODULE}
+	${RENDER_PASS}
+	${QUEUE_FAMILY}
+	${GRAPHICS_PIPELINE}
+	${PIPELINE_LAYOUT}
+	${BUFFER}
+	${VERTEX_BUFFER}
+	${INDEX_BUFFER}
 )
 
 source_group( Shaders FILES ${SHADERS})
 
 source_group( Engine FILES ${BASE})
-source_group( Utils FILES ${UTILS})
+source_group( Engine\\Renderer FILES ${RENDERER})
+source_group( Engine\\Window FILES ${WINDOW})
+source_group( Engine\\Instance FILES ${INSTANCE})
+source_group( Engine\\Physical_Device FILES ${PHYSICAL_DEVICE})
+source_group( Engine\\Logical_Device FILES ${LOGICAL_DEVICE})
+source_group( Engine\\Command_Pool FILES ${COMMAND_POOL})
+source_group( Engine\\Vulkan_Loader FILES ${VULKAN_LOADER})
+source_group( Engine\\Utils FILES ${UTILS})
+source_group( Engine\\Swapchain FILES ${SWAPCHAIN})
+source_group( Engine\\Sync_Object FILES ${SYNC_OBJECT})
+source_group( Engine\\Shader_Module FILES ${SHADER_MODULE})
+source_group( Engine\\Render_Pass FILES ${RENDER_PASS})
+source_group( Engine\\Queue_Family FILES ${QUEUE_FAMILY})
+source_group( Engine\\Graphics_Pipeline FILES ${GRAPHICS_PIPELINE})
+source_group( Engine\\Pipeline_Layout FILES ${PIPELINE_LAYOUT})
+source_group( Engine\\Buffer FILES ${BUFFER})
+source_group( Engine\\Vertex_Buffer FILES ${VERTEX_BUFFER})
+source_group( Engine\\Index_Buffer FILES ${INDEX_BUFFER})
+
+
+
 source_group( CMake FILES ${CMAKE_TEXT})
+
+add_dependencies (${PROJECT} ${ENGINE})
 
 #----------------------Links Project----------------------#
 
@@ -87,9 +126,6 @@ if(WIN32)
 endif(WIN32)
 
 
-add_custom_command(TARGET ${PROJECT} PRE_BUILD 
-COMMAND cmd /c ${CMAKE_SOURCE_DIR}/Data/Shaders/compile.bat)
-
 add_custom_command(TARGET ${PROJECT} PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
 	${CMAKE_SOURCE_DIR}/Data ./Data)
@@ -101,3 +137,6 @@ add_custom_command(TARGET ${PROJECT} PRE_BUILD
 add_custom_command(TARGET ${PROJECT} PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_SOURCE_DIR}/Data ${CMAKE_BINARY_DIR}/Release/Data)
+
+add_custom_command(TARGET ${PROJECT} PRE_BUILD 
+	COMMAND cmd /c ${CMAKE_SOURCE_DIR}/Data/Shaders/compile.bat)

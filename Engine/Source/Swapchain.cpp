@@ -85,10 +85,14 @@ namespace Ly {
 	{
 		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 			return capabilities.currentExtent;
-
 		}
 		else {
-			VkExtent2D actualExtent = { (uint32_t)m_window->m_width, (uint32_t)m_window->m_height };
+			m_window->updateWindowSize();
+
+			VkExtent2D actualExtent = { 
+				static_cast<uint32_t>(m_window->m_width), 
+				static_cast<uint32_t>(m_window->m_height) 
+			};
 
 			actualExtent.width = std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, actualExtent.width));
 			actualExtent.height = std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height));
