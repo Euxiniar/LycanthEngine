@@ -21,6 +21,7 @@
 #include <CommandBuffers.h>
 #include <SyncObject.h>
 #include <VertexBuffer.h>
+#include <IndexBuffer.h>
 
 #include <memory>
 #include <vector>
@@ -57,6 +58,7 @@ namespace Ly {
 		void recreateSwapchain();
 		void cleanupSwapChain();
 		void createVertexBuffer();
+		void createIndexBuffer();
 		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer);
 
 		const std::vector<const char*> m_deviceExtensions = {
@@ -67,9 +69,14 @@ namespace Ly {
 		size_t currentFrame = 0;
 
 		const std::vector<Vertex> m_vertices = {
-			{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-			{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-			{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+			{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+			{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+			{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+		};
+
+		const std::vector<uint16_t> m_indices = {
+			0, 1, 2, 2, 3, 0
 		};
 
 		std::unique_ptr<Ly::Window>& m_window;
@@ -96,6 +103,7 @@ namespace Ly {
 		std::vector<std::unique_ptr<Ly::CommandPool>> m_commandPools;
 		std::unique_ptr<Ly::CommandBuffers> m_commandBuffers;
 		std::unique_ptr<Ly::VertexBuffer> m_vertexBuffer;
+		std::unique_ptr<Ly::IndexBuffer> m_indexBuffer;
 		std::vector<std::unique_ptr<Ly::SyncObject>> m_syncObjects;
 	};
 }

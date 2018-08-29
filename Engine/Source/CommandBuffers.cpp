@@ -4,12 +4,15 @@ namespace Ly {
 	CommandBuffers::CommandBuffers(VkDevice & device, VkCommandPool& commandPool, 
 		std::vector<VkFramebuffer>& swapChainFramebuffers, 
 		VkPipeline & graphicsPipeline, VkRenderPass& renderPass,
-		VkExtent2D& swapChainExtent, VkBuffer& vertexBuffer)
+		VkExtent2D& swapChainExtent, VkBuffer& vertexBuffer,
+		VkBuffer& indexBuffer, uint32_t indicesSize)
 		: m_device(device), m_commandPool(commandPool), 
 		m_swapChainFramebuffers(swapChainFramebuffers), 
 		m_graphicsPipeline(graphicsPipeline),
 		m_renderPass(renderPass), m_swapChainExtent(swapChainExtent),
-		m_vertexBuffer(vertexBuffer)
+		m_vertexBuffer(vertexBuffer),
+		m_indexBuffer(indexBuffer),
+		m_indicesSize(indicesSize)
 	{
 		create();
 	}
@@ -70,6 +73,8 @@ namespace Ly {
 			VkBuffer vertexBuffers[] = { m_vertexBuffer };
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(m_commandBuffers[i], 0, 1, vertexBuffers, offsets);
+			vkCmdBindIndexBuffer(m_commandBuffers[i], m_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+			vkCmdDrawIndexed(m_commandBuffers[i], m_indicesSize, 1, 0, 0, 0);
 
 			vkCmdDraw(m_commandBuffers[i], 3, 1, 0, 0);
 

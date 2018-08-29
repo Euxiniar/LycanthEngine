@@ -12,6 +12,7 @@ namespace Ly
 	{
 		cleanupSwapChain();
 
+		m_indexBuffer.reset();
 		m_vertexBuffer.reset();
 
 		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
@@ -82,6 +83,7 @@ namespace Ly
 		createFramebuffers();
 		createCommandPool();
 		createVertexBuffer();
+		createIndexBuffer();
 		createCommandBuffers();
 		createSyncObjects();
 	}
@@ -183,11 +185,28 @@ namespace Ly
 		copyBuffer(stagingBuffer.get(), m_vertexBuffer->get());
 	}
 
+	void VulkanLoader::createIndexBuffer()
+	{
+		Ly::Buffer stagingBuffer(m_device->get(), m_physicalDevice->get(), sizeof(m_indices[0]) * m_indices.size(),
+			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+		void* data;
+		vkMapMemory(m_device->get(), stagingBuffer.getMemory(), 0, stagingBuffer.getSize(), 0, &data);
+		memcpy(data, m_indices.data(), (size_t)stagingBuffer.getSize());
+		vkUnmapMemory(m_device->get(), stagingBuffer.getMemory());
+
+		m_indexBuffer = std::make_unique<Ly::IndexBuffer>(m_device->get(),
+			m_physicalDevice->get(), stagingBuffer.getSize());
+
+		copyBuffer(stagingBuffer.get(), m_indexBuffer->get());
+	}
+
 	void VulkanLoader::createCommandBuffers()
 	{
 		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(m_device->get(), m_commandPools.at(0)->get(), 
 			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent,
-			m_vertexBuffer->get());
+			m_vertexBuffer->get(), m_indexBuffer->get(), static_cast<uint32_t>(m_indices.size()));
 	}
 
 	void VulkanLoader::createSyncObjects()

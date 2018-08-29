@@ -62,6 +62,7 @@ add_library(${ENGINE} STATIC
 	${PIPELINE_LAYOUT}
 	${BUFFER}
 	${VERTEX_BUFFER}
+	${INDEX_BUFFER}
 )
 
 source_group( Shaders FILES ${SHADERS})
@@ -84,6 +85,7 @@ source_group( Engine\\Graphics_Pipeline FILES ${GRAPHICS_PIPELINE})
 source_group( Engine\\Pipeline_Layout FILES ${PIPELINE_LAYOUT})
 source_group( Engine\\Buffer FILES ${BUFFER})
 source_group( Engine\\Vertex_Buffer FILES ${VERTEX_BUFFER})
+source_group( Engine\\Index_Buffer FILES ${INDEX_BUFFER})
 
 
 

@@ -119,6 +119,12 @@ set(VERTEX_BUFFER
     PARENT_SCOPE
 )
 
+set(INDEX_BUFFER
+	${DIR}/IndexBuffer.h
+	${DIR}/IndexBuffer.cpp
+    PARENT_SCOPE
+)
+
 set(CMAKE_TEXT
     ${DIR}/CMakeLists.txt
     PARENT_SCOPE

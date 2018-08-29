@@ -10,7 +10,9 @@ namespace Ly {
 			std::vector<VkFramebuffer>& swapChainFramebuffers, VkPipeline& graphicsPipeline,
 			VkRenderPass& renderPass,
 			VkExtent2D& swapChainExtent,
-			VkBuffer& vertexBuffer);
+			VkBuffer& vertexBuffer,
+			VkBuffer& indexBuffer,
+			uint32_t indicesSize);
 		~CommandBuffers();
 		std::vector<VkCommandBuffer>& get();
 		VkCommandBuffer& get(uint32_t indice);
@@ -25,6 +27,8 @@ namespace Ly {
 		VkRenderPass& m_renderPass;
 		VkExtent2D& m_swapChainExtent;
 		VkBuffer& m_vertexBuffer;
+		VkBuffer& m_indexBuffer;
+		uint32_t m_indicesSize;
 
 		void create();
 	};
