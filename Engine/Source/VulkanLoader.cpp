@@ -17,7 +17,12 @@ namespace Ly
 		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
 			m_syncObjects.at(i).reset();
 		}
-		m_commandPool.reset();
+
+		for (int i = 0; i < m_commandPools.size(); i++)
+		{
+			m_commandPools.at(i).reset();
+		}
+		
 		m_device.reset();
 
 		if (Ly::ValidationLayers::areEnabled()) {
@@ -117,7 +122,7 @@ namespace Ly
 	{
 		m_device = std::make_unique<Ly::LogicalDevice>(m_physicalDevice->get(), 
 			m_surface, m_validationLayers->get(), 
-			m_deviceExtensions, m_graphicsQueue, m_presentQueue);
+			m_deviceExtensions, m_graphicsQueue, m_presentQueue, m_transferQueue);
 	}
 
 	void VulkanLoader::createSwapChain()
@@ -156,18 +161,31 @@ namespace Ly
 
 	void VulkanLoader::createCommandPool()
 	{
-		m_commandPool = std::make_unique<Ly::CommandPool>(m_device->get(), m_physicalDevice->get(), m_surface);
+		QueueFamilyIndices queueFamilyIndices = QueueFamily::findQueueFamilies(m_physicalDevice->get(), m_surface);
+		m_commandPools.push_back(std::make_unique<Ly::CommandPool>(m_device->get(), queueFamilyIndices.graphicsFamily));
+		m_commandPools.push_back(std::make_unique<Ly::CommandPool>(m_device->get(), queueFamilyIndices.presentFamily));
 	}
 
 	void VulkanLoader::createVertexBuffer()
 	{
+		Ly::Buffer stagingBuffer(m_device->get(), m_physicalDevice->get(), sizeof(m_vertices[0]) * m_vertices.size(),
+			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+		void* data;
+		vkMapMemory(m_device->get(), stagingBuffer.getMemory(), 0, stagingBuffer.getSize(), 0, &data);
+		memcpy(data, m_vertices.data(), (size_t)stagingBuffer.getSize());
+		vkUnmapMemory(m_device->get(), stagingBuffer.getMemory());
+
 		m_vertexBuffer = std::make_unique<Ly::VertexBuffer>(m_device->get(),
-			m_physicalDevice->get(), sizeof(m_vertices[0]) * m_vertices.size(), (void *) m_vertices.data());
+			m_physicalDevice->get(), stagingBuffer.getSize(), (void *) m_vertices.data());
+
+		copyBuffer(stagingBuffer.get(), m_vertexBuffer->get());
 	}
 
 	void VulkanLoader::createCommandBuffers()
 	{
-		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(m_device->get(), m_commandPool->get(), 
+		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(m_device->get(), m_commandPools.at(0)->get(), 
 			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent,
 			m_vertexBuffer->get());
 	}
@@ -243,5 +261,41 @@ namespace Ly
 	void VulkanLoader::waitIdle()
 	{
 		vkDeviceWaitIdle(m_device->get());
+	}
+
+	void VulkanLoader::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer)
+	{
+		VkCommandBufferAllocateInfo allocInfo = {};
+		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		allocInfo.commandPool = m_commandPools.at(1)->get();
+		allocInfo.commandBufferCount = 1;
+
+		VkCommandBuffer commandBuffer;
+		vkAllocateCommandBuffers(m_device->get(), &allocInfo, &commandBuffer);
+
+		VkCommandBufferBeginInfo beginInfo = {};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+		vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+		VkBufferCopy copyRegion = {};
+		copyRegion.srcOffset = 0; 
+		copyRegion.dstOffset = 0; 
+		copyRegion.size = m_vertexBuffer->getSize();
+		vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+		vkEndCommandBuffer(commandBuffer);
+
+		VkSubmitInfo submitInfo = {};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &commandBuffer;
+
+		vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+		vkQueueWaitIdle(m_graphicsQueue);
+
+		vkFreeCommandBuffers(m_device->get(), m_commandPools.at(1)->get(), 1, &commandBuffer);
 	}
 }

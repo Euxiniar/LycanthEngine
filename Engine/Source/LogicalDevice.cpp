@@ -6,10 +6,12 @@ namespace Ly {
 		const std::vector<const char*>& validationLayers,
 		const std::vector<const char*>& deviceExtensions,
 		VkQueue& graphicsQueue,
-		VkQueue& presentQueue)
+		VkQueue& presentQueue,
+		VkQueue& transferQueue)
 		: m_physicalDevice(physicalDevice), m_surface(surface), 
 		m_validationLayers(validationLayers), m_deviceExtensions(deviceExtensions),
-		m_graphicsQueue(graphicsQueue), m_presentQueue(presentQueue)
+		m_graphicsQueue(graphicsQueue), m_presentQueue(presentQueue),
+		m_transferQueue(transferQueue)
 	{
 		create();
 	}
@@ -29,7 +31,7 @@ namespace Ly {
 		QueueFamilyIndices indices = Ly::QueueFamily::findQueueFamilies(m_physicalDevice, m_surface);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-		std::set<int> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };
+		std::set<int> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily, indices.transferFamily };
 
 		float queuePriority = 1.0f;
 		for (int queueFamily : uniqueQueueFamilies) {
@@ -65,5 +67,6 @@ namespace Ly {
 
 		vkGetDeviceQueue(m_device, indices.graphicsFamily, 0, &m_graphicsQueue);
 		vkGetDeviceQueue(m_device, indices.presentFamily, 0, &m_presentQueue);
+		vkGetDeviceQueue(m_device, indices.transferFamily, 0, &m_transferQueue);
 	}
 }

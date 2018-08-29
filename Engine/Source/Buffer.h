@@ -12,6 +12,8 @@ namespace Ly {
 			VkMemoryPropertyFlags properties);
 		~Buffer();
 		VkBuffer& get();
+		VkDeviceMemory& getMemory();
+		VkDeviceSize getSize();
 		
 	protected:
 		VkBuffer m_buffer;

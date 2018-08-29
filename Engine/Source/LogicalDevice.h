@@ -14,7 +14,8 @@ namespace Ly {
 			const std::vector<const char*>& validationLayers, 
 			const std::vector<const char*>& deviceExtensions,
 			VkQueue& graphicsQueue, 
-			VkQueue& presentQueue);
+			VkQueue& presentQueue,
+			VkQueue& transferQueue);
 		~LogicalDevice();
 		VkDevice& get();
 		
@@ -26,6 +27,8 @@ namespace Ly {
 		const std::vector<const char*>& m_deviceExtensions;
 		VkQueue& m_graphicsQueue;
 		VkQueue& m_presentQueue;
+		VkQueue& m_transferQueue;
+
 		void create();
 	};
 }

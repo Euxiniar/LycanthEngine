@@ -9,9 +9,10 @@ namespace Ly {
 		int graphicsFamily = -1;
 		//Queue Family which supports display presentation
 		int presentFamily = -1;
-
+		//Queue Family which supports transfers operations
+		int transferFamily = -1;
 		bool matches() {
-			return graphicsFamily >= 0 && presentFamily >= 0;
+			return graphicsFamily >= 0 && presentFamily >= 0 && transferFamily >= 0;
 		}
 	};
 

@@ -3,6 +3,7 @@
 #include <VulkanLoader.h>
 #include <Utils/Log.h>
 #include <memory>
+#include <GLFW/glfw3.h>
 
 namespace Ly {
 	class Renderer {

@@ -31,6 +31,16 @@ namespace Ly {
 		return m_buffer;
 	}
 
+	VkDeviceMemory& Buffer::getMemory()
+	{
+		return m_bufferMemory;
+	}
+
+	VkDeviceSize Buffer::getSize()
+	{
+		return m_bufferSize;
+	}
+
 	void Buffer::create(VkBufferCreateInfo & bufferInfo, const VkMemoryPropertyFlags& properties)
 	{
 		if (vkCreateBuffer(m_device, &bufferInfo, nullptr, &m_buffer) != VK_SUCCESS) {

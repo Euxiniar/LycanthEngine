@@ -57,6 +57,7 @@ namespace Ly {
 		void recreateSwapchain();
 		void cleanupSwapChain();
 		void createVertexBuffer();
+		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer);
 
 		const std::vector<const char*> m_deviceExtensions = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -82,6 +83,7 @@ namespace Ly {
 		std::unique_ptr<Ly::LogicalDevice> m_device;
 		VkQueue m_graphicsQueue;
 		VkQueue m_presentQueue;
+		VkQueue m_transferQueue;
 		std::unique_ptr<Ly::Swapchain> m_swapChain;
 		std::vector<VkImage> m_swapChainImages;
 		VkFormat m_swapChainImageFormat;
@@ -91,7 +93,7 @@ namespace Ly {
 		std::unique_ptr<Ly::GraphicsPipeline> m_graphicsPipeline;
 		std::unique_ptr<Ly::RenderPass> m_renderPass;
 		std::unique_ptr<Ly::Framebuffers> m_swapChainFramebuffers;
-		std::unique_ptr<Ly::CommandPool> m_commandPool;
+		std::vector<std::unique_ptr<Ly::CommandPool>> m_commandPools;
 		std::unique_ptr<Ly::CommandBuffers> m_commandBuffers;
 		std::unique_ptr<Ly::VertexBuffer> m_vertexBuffer;
 		std::vector<std::unique_ptr<Ly::SyncObject>> m_syncObjects;
