@@ -21,7 +21,7 @@ namespace Ly
 	void Renderer::initWindow()
 	{
 		try {
-			m_window = std::make_unique<Ly::Window>();
+			m_window = std::make_unique<Ly::Window>(m_title);
 		}
 		catch (const std::runtime_error&) {
 			Ly::Log::error("Error during the window creation process");
@@ -48,7 +48,9 @@ namespace Ly
 			nbFrames++;
 			if (currentTime - lastTime >= 1.0) { // If last prinf() was more than 1 sec ago
 				// printf and reset timer
-				printf("%i Frames per second\n", (int)nbFrames);
+			    std::string toDraw;
+				toDraw = m_title + " " + "[" + std::to_string(nbFrames) + "]";
+				m_window->setTitle(toDraw.c_str());
 				nbFrames = 0;
 				lastTime += 1.0;
 			}

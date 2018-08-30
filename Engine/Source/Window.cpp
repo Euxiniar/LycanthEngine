@@ -34,6 +34,11 @@ namespace Ly
 		glfwGetFramebufferSize(m_window, &m_width, &m_height);
 	}
 
+	void Window::setTitle(const char * title)
+	{
+		glfwSetWindowTitle(m_window, title);
+	}
+
 	void Window::create()
 	{
 		glfwInit();
@@ -44,5 +49,6 @@ namespace Ly
 		m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
 		glfwSetWindowUserPointer(m_window, this);
 		glfwSetFramebufferSizeCallback(m_window, framebufferResizeCallback);
+		
 	}
 }

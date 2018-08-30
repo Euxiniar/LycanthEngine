@@ -21,5 +21,6 @@ namespace Ly {
 
 		std::unique_ptr<Ly::Window> m_window;
 		std::unique_ptr<Ly::VulkanLoader> m_vulkanLoader;
+		std::string m_title = "LycanthEngine";
 	};
 }
