@@ -60,9 +60,12 @@ add_library(${ENGINE} STATIC
 	${QUEUE_FAMILY}
 	${GRAPHICS_PIPELINE}
 	${PIPELINE_LAYOUT}
+	${DESCRIPTOR_SET_LAYOUT}
 	${BUFFER}
 	${VERTEX_BUFFER}
 	${INDEX_BUFFER}
+	${UNIFORM_BUFFER}
+	${DESCRIPTOR_POOL}
 )
 
 source_group( Shaders FILES ${SHADERS})
@@ -83,11 +86,12 @@ source_group( Engine\\Render_Pass FILES ${RENDER_PASS})
 source_group( Engine\\Queue_Family FILES ${QUEUE_FAMILY})
 source_group( Engine\\Graphics_Pipeline FILES ${GRAPHICS_PIPELINE})
 source_group( Engine\\Pipeline_Layout FILES ${PIPELINE_LAYOUT})
+source_group( Engine\\Descriptor_Set_Layout FILES ${DESCRIPTOR_SET_LAYOUT})
 source_group( Engine\\Buffer FILES ${BUFFER})
 source_group( Engine\\Vertex_Buffer FILES ${VERTEX_BUFFER})
 source_group( Engine\\Index_Buffer FILES ${INDEX_BUFFER})
-
-
+source_group( Engine\\Uniform_Buffer FILES ${UNIFORM_BUFFER})
+source_group( Engine\\Descriptor_Pool FILES ${DESCRIPTOR_POOL})
 
 source_group( CMake FILES ${CMAKE_TEXT})
 

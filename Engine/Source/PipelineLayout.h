@@ -5,7 +5,7 @@
 namespace Ly {
 	class PipelineLayout {
 	public:
-		PipelineLayout(VkDevice& device);
+		PipelineLayout(VkDevice& device, VkDescriptorSetLayout& descriptorSetLayout);
 		~PipelineLayout();
 
 		void create();
@@ -13,6 +13,7 @@ namespace Ly {
 
 	private:
 		VkDevice & m_device;
+		VkDescriptorSetLayout& m_descriptorSetLayout;
 
 		VkPipelineLayout m_pipelineLayout;
 	};

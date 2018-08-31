@@ -14,6 +14,7 @@ set(BASE
 	${DIR}/CommandBuffers.h
 	${DIR}/CommandBuffers.cpp
 	${DIR}/Vertex.hpp
+	${DIR}/UniformBufferObject.hpp
     PARENT_SCOPE
 )
 
@@ -107,6 +108,12 @@ set(PIPELINE_LAYOUT
     PARENT_SCOPE
 )
 
+set(DESCRIPTOR_SET_LAYOUT
+	${DIR}/DescriptorSetLayout.h
+	${DIR}/DescriptorSetLayout.cpp
+    PARENT_SCOPE
+)
+
 set(BUFFER
 	${DIR}/Buffer.h
 	${DIR}/Buffer.cpp
@@ -122,6 +129,18 @@ set(VERTEX_BUFFER
 set(INDEX_BUFFER
 	${DIR}/IndexBuffer.h
 	${DIR}/IndexBuffer.cpp
+    PARENT_SCOPE
+)
+
+set(UNIFORM_BUFFER
+	${DIR}/UniformBuffer.h
+	${DIR}/UniformBuffer.cpp
+    PARENT_SCOPE
+)
+
+set(DESCRIPTOR_POOL
+	${DIR}/DescriptorPool.h
+	${DIR}/DescriptorPool.cpp
     PARENT_SCOPE
 )
 

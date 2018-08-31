@@ -2,17 +2,19 @@
 
 namespace Ly {
 	CommandBuffers::CommandBuffers(VkDevice & device, VkCommandPool& commandPool, 
-		std::vector<VkFramebuffer>& swapChainFramebuffers, 
+		std::vector<VkFramebuffer>& swapChainFramebuffers, VkPipelineLayout& pipelineLayout,
 		VkPipeline & graphicsPipeline, VkRenderPass& renderPass,
 		VkExtent2D& swapChainExtent, VkBuffer& vertexBuffer,
-		VkBuffer& indexBuffer, uint32_t indicesSize)
+		VkBuffer& indexBuffer, uint32_t indicesSize, std::vector<VkDescriptorSet>& descriptorSets)
 		: m_device(device), m_commandPool(commandPool), 
 		m_swapChainFramebuffers(swapChainFramebuffers), 
+		m_pipelineLayout(pipelineLayout),
 		m_graphicsPipeline(graphicsPipeline),
 		m_renderPass(renderPass), m_swapChainExtent(swapChainExtent),
 		m_vertexBuffer(vertexBuffer),
 		m_indexBuffer(indexBuffer),
-		m_indicesSize(indicesSize)
+		m_indicesSize(indicesSize),
+		m_descriptorSets(descriptorSets)
 	{
 		create();
 	}
@@ -74,6 +76,7 @@ namespace Ly {
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(m_commandBuffers[i], 0, 1, vertexBuffers, offsets);
 			vkCmdBindIndexBuffer(m_commandBuffers[i], m_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+			vkCmdBindDescriptorSets(m_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSets[i], 0, nullptr);
 			vkCmdDrawIndexed(m_commandBuffers[i], m_indicesSize, 1, 0, 0, 0);
 
 			vkCmdDraw(m_commandBuffers[i], 3, 1, 0, 0);

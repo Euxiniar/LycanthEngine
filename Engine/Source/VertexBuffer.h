@@ -7,12 +7,7 @@ namespace Ly {
 	public:
 		VertexBuffer(VkDevice &device,
 			VkPhysicalDevice &physicalDevice,
-			VkDeviceSize size,
-			void* data);
+			VkDeviceSize size);
 		~VertexBuffer();
-
-	private:
-		void create();
-		void* m_data;
 	};
 }

@@ -13,6 +13,7 @@
 #include <QueueFamily.h>
 #include <LogicalDevice.h>
 #include <ImageViews.h>
+#include <DescriptorSetLayout.h>
 #include <PipelineLayout.h>
 #include <GraphicsPipeline.h>
 #include <RenderPass.h>
@@ -22,6 +23,8 @@
 #include <SyncObject.h>
 #include <VertexBuffer.h>
 #include <IndexBuffer.h>
+#include <UniformBuffer.h>
+#include <DescriptorPool.h>
 
 #include <memory>
 #include <vector>
@@ -49,6 +52,7 @@ namespace Ly {
 		void createSwapChain();
 		void createImageViews();
 		void createRenderPass();
+		void createDescriptorSetLayout();
 		void createPipelineLayout();
 		void createGraphicsPipeline();
 		void createFramebuffers();
@@ -59,6 +63,9 @@ namespace Ly {
 		void cleanupSwapChain();
 		void createVertexBuffer();
 		void createIndexBuffer();
+		void createUniformBuffer();
+		void createDescriptorPool();
+		void createDescriptorSet();
 		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer);
 
 		const std::vector<const char*> m_deviceExtensions = {
@@ -96,6 +103,7 @@ namespace Ly {
 		VkFormat m_swapChainImageFormat;
 		VkExtent2D m_swapChainExtent;
 		std::unique_ptr<Ly::ImageViews> m_swapChainImageViews;
+		std::unique_ptr<Ly::DescriptorSetLayout> m_descriptorSetLayout;
 		std::unique_ptr<Ly::PipelineLayout> m_pipelineLayout;
 		std::unique_ptr<Ly::GraphicsPipeline> m_graphicsPipeline;
 		std::unique_ptr<Ly::RenderPass> m_renderPass;
@@ -104,6 +112,9 @@ namespace Ly {
 		std::unique_ptr<Ly::CommandBuffers> m_commandBuffers;
 		std::unique_ptr<Ly::VertexBuffer> m_vertexBuffer;
 		std::unique_ptr<Ly::IndexBuffer> m_indexBuffer;
+		std::vector< std::unique_ptr<Ly::UniformBuffer>> m_uniformBuffers;
 		std::vector<std::unique_ptr<Ly::SyncObject>> m_syncObjects;
+		std::unique_ptr<Ly::DescriptorPool> m_descriptorPool;
+		std::vector<VkDescriptorSet> m_descriptorSets;
 	};
 }

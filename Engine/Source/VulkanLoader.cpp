@@ -12,6 +12,13 @@ namespace Ly
 	{
 		cleanupSwapChain();
 
+		m_descriptorPool.reset();
+		m_descriptorSetLayout.reset();
+
+		for (size_t i = 0; i < m_swapChainImages.size(); i++) {
+			m_uniformBuffers.at(i).reset();
+		}
+
 		m_indexBuffer.reset();
 		m_vertexBuffer.reset();
 
@@ -78,12 +85,16 @@ namespace Ly
 		createSwapChain();
 		createImageViews();
 		createRenderPass();
+		createDescriptorSetLayout();
 		createPipelineLayout();
 		createGraphicsPipeline();
 		createFramebuffers();
 		createCommandPool();
 		createVertexBuffer();
 		createIndexBuffer();
+		createUniformBuffer();
+		createDescriptorPool();
+		createDescriptorSet();
 		createCommandBuffers();
 		createSyncObjects();
 	}
@@ -144,9 +155,14 @@ namespace Ly
 		m_renderPass = std::make_unique<Ly::RenderPass>(m_device->get(), m_swapChainImageFormat);
 	}
 
+	void VulkanLoader::createDescriptorSetLayout()
+	{
+		m_descriptorSetLayout = std::make_unique<Ly::DescriptorSetLayout>(m_device->get());
+	}
+
 	void VulkanLoader::createPipelineLayout()
 	{
-		m_pipelineLayout = std::make_unique<Ly::PipelineLayout>(m_device->get());
+		m_pipelineLayout = std::make_unique<Ly::PipelineLayout>(m_device->get(), m_descriptorSetLayout->get());
 	}
 
 	void VulkanLoader::createGraphicsPipeline()
@@ -180,7 +196,7 @@ namespace Ly
 		vkUnmapMemory(m_device->get(), stagingBuffer.getMemory());
 
 		m_vertexBuffer = std::make_unique<Ly::VertexBuffer>(m_device->get(),
-			m_physicalDevice->get(), stagingBuffer.getSize(), (void *) m_vertices.data());
+			m_physicalDevice->get(), stagingBuffer.getSize());
 
 		copyBuffer(stagingBuffer.get(), m_vertexBuffer->get());
 	}
@@ -202,11 +218,58 @@ namespace Ly
 		copyBuffer(stagingBuffer.get(), m_indexBuffer->get());
 	}
 
+	void VulkanLoader::createUniformBuffer()
+	{
+		VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+		for (int i = 0; i < m_swapChainImages.size(); i++)
+		{
+			m_uniformBuffers.push_back(std::make_unique<Ly::UniformBuffer>(m_device->get(), m_physicalDevice->get(), bufferSize));
+		}
+	}
+
+	void VulkanLoader::createDescriptorPool()
+	{
+		m_descriptorPool = std::make_unique<Ly::DescriptorPool>(m_device->get(), static_cast<uint32_t>(m_swapChainImages.size()), static_cast<uint32_t>(m_swapChainImages.size()));
+	}
+
+	void VulkanLoader::createDescriptorSet()
+	{
+		std::vector<VkDescriptorSetLayout> layouts(m_swapChainImages.size(), m_descriptorSetLayout->get());
+		VkDescriptorSetAllocateInfo allocInfo = {};
+		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		allocInfo.descriptorPool = m_descriptorPool->get();
+		allocInfo.descriptorSetCount = static_cast<uint32_t>(m_swapChainImages.size());
+		allocInfo.pSetLayouts = layouts.data();
+
+		m_descriptorSets.resize(m_swapChainImages.size());
+		if (vkAllocateDescriptorSets(m_device->get(), &allocInfo, &m_descriptorSets[0]) != VK_SUCCESS) {
+			Ly::Log::error("Failed to allocate descriptor sets!");
+		}
+
+		for (size_t i = 0; i < m_swapChainImages.size(); i++) {
+			VkDescriptorBufferInfo bufferInfo = {};
+			bufferInfo.buffer = m_uniformBuffers[i]->get();
+			bufferInfo.offset = 0;
+			bufferInfo.range = sizeof(UniformBufferObject);
+
+			VkWriteDescriptorSet descriptorWrite = {};
+			descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrite.dstSet = m_descriptorSets[i];
+			descriptorWrite.dstBinding = 0;
+			descriptorWrite.dstArrayElement = 0;
+			descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrite.descriptorCount = 1;
+			descriptorWrite.pBufferInfo = &bufferInfo;
+
+			vkUpdateDescriptorSets(m_device->get(), 1, &descriptorWrite, 0, nullptr);
+		}
+	}
+
 	void VulkanLoader::createCommandBuffers()
 	{
 		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(m_device->get(), m_commandPools.at(0)->get(), 
-			m_swapChainFramebuffers->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent,
-			m_vertexBuffer->get(), m_indexBuffer->get(), static_cast<uint32_t>(m_indices.size()));
+			m_swapChainFramebuffers->get(), m_pipelineLayout->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent,
+			m_vertexBuffer->get(), m_indexBuffer->get(), static_cast<uint32_t>(m_indices.size()), m_descriptorSets);
 	}
 
 	void VulkanLoader::createSyncObjects()
@@ -230,6 +293,8 @@ namespace Ly
 		else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
 			Ly::Log::error("Failed to acquire swap chain image !");
 		}
+
+		m_uniformBuffers.at(imageIndex)->update(m_swapChainExtent.width, m_swapChainExtent.height);
 
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

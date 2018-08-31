@@ -9,6 +9,5 @@ namespace Ly {
 			VkPhysicalDevice &physicalDevice,
 			VkDeviceSize size);
 		~IndexBuffer();
-
 	};
 }
