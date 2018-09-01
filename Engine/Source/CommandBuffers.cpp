@@ -79,8 +79,6 @@ namespace Ly {
 			vkCmdBindDescriptorSets(m_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSets[i], 0, nullptr);
 			vkCmdDrawIndexed(m_commandBuffers[i], m_indicesSize, 1, 0, 0, 0);
 
-			vkCmdDraw(m_commandBuffers[i], 3, 1, 0, 0);
-
 			vkCmdEndRenderPass(m_commandBuffers[i]);
 
 			if (vkEndCommandBuffer(m_commandBuffers[i]) != VK_SUCCESS) {

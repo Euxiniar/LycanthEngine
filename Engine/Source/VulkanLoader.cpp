@@ -229,7 +229,8 @@ namespace Ly
 
 	void VulkanLoader::createDescriptorPool()
 	{
-		m_descriptorPool = std::make_unique<Ly::DescriptorPool>(m_device->get(), static_cast<uint32_t>(m_swapChainImages.size()), static_cast<uint32_t>(m_swapChainImages.size()));
+		m_descriptorPool = std::make_unique<Ly::DescriptorPool>(m_device->get(), 
+			static_cast<uint32_t>(m_swapChainImages.size()), static_cast<uint32_t>(m_swapChainImages.size()));
 	}
 
 	void VulkanLoader::createDescriptorSet()
