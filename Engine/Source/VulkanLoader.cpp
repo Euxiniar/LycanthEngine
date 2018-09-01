@@ -16,19 +16,19 @@ namespace Ly
 		m_descriptorSetLayout.reset();
 
 		for (size_t i = 0; i < m_swapChainImages.size(); i++) {
-			m_uniformBuffers.at(i).reset();
+			m_uniformBuffers[i].reset();
 		}
 
 		m_indexBuffer.reset();
 		m_vertexBuffer.reset();
 
 		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
-			m_syncObjects.at(i).reset();
+			m_syncObjects[i].reset();
 		}
 
 		for (int i = 0; i < m_commandPools.size(); i++)
 		{
-			m_commandPools.at(i).reset();
+			m_commandPools[i].reset();
 		}
 		
 		m_device.reset();
@@ -267,7 +267,7 @@ namespace Ly
 
 	void VulkanLoader::createCommandBuffers()
 	{
-		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(m_device->get(), m_commandPools.at(0)->get(), 
+		m_commandBuffers = std::make_unique<Ly::CommandBuffers>(m_device->get(), m_commandPools[0]->get(), 
 			m_swapChainFramebuffers->get(), m_pipelineLayout->get(), m_graphicsPipeline->get(), m_renderPass->get(), m_swapChainExtent,
 			m_vertexBuffer->get(), m_indexBuffer->get(), static_cast<uint32_t>(m_indices.size()), m_descriptorSets);
 	}
@@ -280,11 +280,11 @@ namespace Ly
 
 	void VulkanLoader::drawFrame()
 	{
-		vkWaitForFences(m_device->get(), 1, &m_syncObjects.at(currentFrame)->getInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
+		vkWaitForFences(m_device->get(), 1, &m_syncObjects[currentFrame]->getInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
 
 		uint32_t imageIndex;
 		VkResult result = vkAcquireNextImageKHR(m_device->get(), m_swapChain->get(), std::numeric_limits<uint64_t>::max(), 
-			m_syncObjects.at(currentFrame)->getImageAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
+			m_syncObjects[currentFrame]->getImageAvailableSemaphore(), VK_NULL_HANDLE, &imageIndex);
 
 		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
 			recreateSwapchain();
@@ -294,12 +294,12 @@ namespace Ly
 			Ly::Log::error("Failed to acquire swap chain image !");
 		}
 
-		m_uniformBuffers.at(imageIndex)->update(m_swapChainExtent.width, m_swapChainExtent.height);
+		m_uniformBuffers[imageIndex]->update(m_swapChainExtent.width, m_swapChainExtent.height);
 
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-		VkSemaphore waitSemaphores[] = { m_syncObjects.at(currentFrame)->getImageAvailableSemaphore() };
+		VkSemaphore waitSemaphores[] = { m_syncObjects[currentFrame]->getImageAvailableSemaphore() };
 		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
@@ -307,13 +307,13 @@ namespace Ly
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &m_commandBuffers->get(imageIndex);
 
-		VkSemaphore signalSemaphores[] = { m_syncObjects.at(currentFrame)->getRenderFinishedSemaphore() };
+		VkSemaphore signalSemaphores[] = { m_syncObjects[currentFrame]->getRenderFinishedSemaphore() };
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		vkResetFences(m_device->get(), 1, &m_syncObjects.at(currentFrame)->getInFlightFence());
+		vkResetFences(m_device->get(), 1, &m_syncObjects[currentFrame]->getInFlightFence());
 
-		if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, m_syncObjects.at(currentFrame)->getInFlightFence()) != VK_SUCCESS) {
+		if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, m_syncObjects[currentFrame]->getInFlightFence()) != VK_SUCCESS) {
 			Ly::Log::error("Failed to submit draw command buffer!");
 		}
 
@@ -352,7 +352,7 @@ namespace Ly
 		VkCommandBufferAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		allocInfo.commandPool = m_commandPools.at(1)->get();
+		allocInfo.commandPool = m_commandPools[1]->get();
 		allocInfo.commandBufferCount = 1;
 
 		VkCommandBuffer commandBuffer;
@@ -380,6 +380,6 @@ namespace Ly
 		vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
 		vkQueueWaitIdle(m_graphicsQueue);
 
-		vkFreeCommandBuffers(m_device->get(), m_commandPools.at(1)->get(), 1, &commandBuffer);
+		vkFreeCommandBuffers(m_device->get(), m_commandPools[1]->get(), 1, &commandBuffer);
 	}
 }
