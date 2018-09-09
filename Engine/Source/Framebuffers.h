@@ -2,12 +2,13 @@
 #include <Utils/Log.h>
 #include <vulkan/vulkan.h>
 #include <vector>
+#include <ImageView.h>
 
 namespace Ly {
 	class Framebuffers {
 	public :
 		Framebuffers(VkDevice& device,
-			std::vector<VkImageView>& swapChainImageViews,
+			std::vector<std::unique_ptr<Ly::ImageView>>& swapChainImageViews,
 			VkRenderPass& renderPass,
 			VkExtent2D& swapChainExtent);
 		~Framebuffers();
@@ -16,7 +17,7 @@ namespace Ly {
 
 	private:
 		VkDevice & m_device;
-		std::vector<VkImageView>& m_swapChainImageViews;
+		std::vector<std::unique_ptr<Ly::ImageView>>& m_swapChainImageViews;
 		VkRenderPass& m_renderPass;
 		VkExtent2D& m_swapChainExtent;
 

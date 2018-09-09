@@ -150,6 +150,18 @@ set(IMAGE
     PARENT_SCOPE
 )
 
+set(IMAGE_VIEW
+	${DIR}/ImageView.h
+	${DIR}/ImageView.cpp
+    PARENT_SCOPE
+)
+
+set(SAMPLER
+	${DIR}/Sampler.h
+	${DIR}/Sampler.cpp
+    PARENT_SCOPE
+)
+
 set(CMAKE_TEXT
     ${DIR}/CMakeLists.txt
     PARENT_SCOPE

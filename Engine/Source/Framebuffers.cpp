@@ -2,7 +2,7 @@
 
 namespace Ly {
 	Framebuffers::Framebuffers(VkDevice & device,
-		std::vector<VkImageView>& swapChainImageViews,
+		std::vector<std::unique_ptr<Ly::ImageView>>& swapChainImageViews,
 		VkRenderPass & renderPass, VkExtent2D & swapChainExtent)
 		: m_device(device), m_swapChainImageViews(swapChainImageViews),
 		m_renderPass(renderPass), m_swapChainExtent(swapChainExtent)
@@ -28,7 +28,7 @@ namespace Ly {
 
 		for (size_t i = 0; i < m_swapChainImageViews.size(); i++) {
 			VkImageView attachments[] = {
-				m_swapChainImageViews[i]
+				m_swapChainImageViews[i]->get()
 			};
 
 			VkFramebufferCreateInfo framebufferInfo = {};

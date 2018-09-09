@@ -3,6 +3,8 @@
 #include <Utils/Log.h>
 #include <Swapchain.h>
 #include <vector>
+#include <ImageView.h>
+#include <memory>
 
 namespace Ly {
 	class ImageViews {
@@ -11,10 +13,10 @@ namespace Ly {
 		std::vector<VkImage>& swapChainImages,
 		VkFormat& swapChainImageFormat);
 		~ImageViews();
-		std::vector<VkImageView>& get();
+		std::vector<std::unique_ptr<Ly::ImageView>>& get();
 
 	private:
-		std::vector<VkImageView> m_swapChainImageViews;
+		std::vector<std::unique_ptr<Ly::ImageView>> m_swapChainImageViews;
 		void create();
 
 		VkDevice& m_device;

@@ -67,6 +67,9 @@ add_library(${ENGINE} STATIC
 	${UNIFORM_BUFFER}
 	${DESCRIPTOR_POOL}
 	${IMAGE}
+	${IMAGE_VIEW}
+	${SAMPLER}
+
 )
 
 source_group( Shaders FILES ${SHADERS})
@@ -94,7 +97,8 @@ source_group( Engine\\Index_Buffer FILES ${INDEX_BUFFER})
 source_group( Engine\\Uniform_Buffer FILES ${UNIFORM_BUFFER})
 source_group( Engine\\Descriptor_Pool FILES ${DESCRIPTOR_POOL})
 source_group( Engine\\Image FILES ${IMAGE})
-
+source_group( Engine\\Image_View FILES ${IMAGE_VIEW})
+source_group( Engine\\Sampler FILES ${SAMPLER})
 
 source_group( CMake FILES ${CMAKE_TEXT})
 

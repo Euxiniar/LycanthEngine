@@ -14,30 +14,23 @@ namespace Ly
 	VulkanLoader::~VulkanLoader()
 	{
 		cleanupSwapChain();
-
+		m_textureSampler.reset();
+		m_textureImageView.reset();
 		m_textureImage.reset();
-
 		m_descriptorPool.reset();
 		m_descriptorSetLayout.reset();
-
 		for (size_t i = 0; i < m_swapChainImages.size(); i++) {
 			m_uniformBuffers[i].reset();
 		}
-
 		m_indexBuffer.reset();
 		m_vertexBuffer.reset();
-
 		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
 			m_syncObjects[i].reset();
 		}
-
-		for (int i = 0; i < m_commandPools.size(); i++)
-		{
+		for (int i = 0; i < m_commandPools.size(); i++){
 			m_commandPools[i].reset();
 		}
-		
 		m_device.reset();
-
 		if (Ly::ValidationLayers::areEnabled()) {
 			m_callback.reset();
 		}
@@ -96,6 +89,8 @@ namespace Ly
 		createFramebuffers();
 		createCommandPool();
 		createTextureImage();
+		createTextureImageView();
+		createTextureSampler();
 		createVertexBuffer();
 		createIndexBuffer();
 		createUniformBuffer();
@@ -305,6 +300,16 @@ namespace Ly
 			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 	}
 
+	void VulkanLoader::createTextureImageView()
+	{
+		m_textureImageView = std::make_unique<Ly::ImageView>(m_device->get(), m_textureImage->get(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
+
+	void VulkanLoader::createTextureSampler()
+	{
+		m_textureSampler = std::make_unique<Ly::Sampler>(m_device->get());
+	}
+
 	void VulkanLoader::createImage(uint32_t width, uint32_t height)
 	{
 		m_textureImage = std::make_unique<Ly::Image>(m_device->get(), m_physicalDevice->get(), width, height);
@@ -319,8 +324,9 @@ namespace Ly
 
 	void VulkanLoader::createSyncObjects()
 	{
-		for(int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-		m_syncObjects.push_back(std::make_unique<Ly::SyncObject>(m_device->get()));
+		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+			m_syncObjects.push_back(std::make_unique<Ly::SyncObject>(m_device->get()));
+		}
 	}
 
 	void VulkanLoader::drawFrame()

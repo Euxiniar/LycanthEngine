@@ -26,6 +26,8 @@
 #include <UniformBuffer.h>
 #include <DescriptorPool.h>
 #include <Image.h>
+#include <ImageView.h>
+#include <Sampler.h>
 
 #include <memory>
 #include <vector>
@@ -68,6 +70,8 @@ namespace Ly {
 		void createDescriptorPool();
 		void createDescriptorSet();
 		void createTextureImage();
+		void createTextureImageView();
+		void createTextureSampler();
 		void createImage(uint32_t width, uint32_t height);
 		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer);
 		VkCommandBuffer beginSingleTimeCommands();
@@ -125,5 +129,7 @@ namespace Ly {
 		std::unique_ptr<Ly::DescriptorPool> m_descriptorPool;
 		std::vector<VkDescriptorSet> m_descriptorSets;
 		std::unique_ptr<Ly::Image> m_textureImage;
+		std::unique_ptr<Ly::ImageView> m_textureImageView;
+		std::unique_ptr<Ly::Sampler> m_textureSampler;
 	};
 }

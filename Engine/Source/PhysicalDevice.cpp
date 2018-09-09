@@ -46,6 +46,9 @@ namespace Ly {
 			swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 		}
 
-		return indices.matches() && extensionSupported && swapChainAdequate;
+		VkPhysicalDeviceFeatures supportedFeatures;
+		vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+
+		return indices.matches() && extensionSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
 	}
 }
