@@ -2,6 +2,7 @@
 #include <vulkan/vulkan.h>
 #include <UniformBufferObject.hpp>
 #include <Utils/Log.h>
+#include <array>
 
 namespace Ly {
 	class DescriptorSetLayout {

@@ -1,6 +1,7 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include <Utils/Log.h>
+#include <array>
 
 namespace Ly {
 	class DescriptorPool {

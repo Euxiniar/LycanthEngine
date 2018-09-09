@@ -68,7 +68,7 @@ namespace Ly {
 		void createIndexBuffer();
 		void createUniformBuffer();
 		void createDescriptorPool();
-		void createDescriptorSet();
+		void createDescriptorSets();
 		void createTextureImage();
 		void createTextureImageView();
 		void createTextureSampler();
@@ -88,10 +88,10 @@ namespace Ly {
 		size_t currentFrame = 0;
 
 		const std::vector<Vertex> m_vertices = {
-			{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-			{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-			{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-			{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+			{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+			{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+			{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+			{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
 		};
 
 		const std::vector<uint16_t> m_indices = {
