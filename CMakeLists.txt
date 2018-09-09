@@ -66,6 +66,7 @@ add_library(${ENGINE} STATIC
 	${INDEX_BUFFER}
 	${UNIFORM_BUFFER}
 	${DESCRIPTOR_POOL}
+	${IMAGE}
 )
 
 source_group( Shaders FILES ${SHADERS})
@@ -92,6 +93,8 @@ source_group( Engine\\Vertex_Buffer FILES ${VERTEX_BUFFER})
 source_group( Engine\\Index_Buffer FILES ${INDEX_BUFFER})
 source_group( Engine\\Uniform_Buffer FILES ${UNIFORM_BUFFER})
 source_group( Engine\\Descriptor_Pool FILES ${DESCRIPTOR_POOL})
+source_group( Engine\\Image FILES ${IMAGE})
+
 
 source_group( CMake FILES ${CMAKE_TEXT})
 
@@ -114,8 +117,8 @@ if(WIN32)
 
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -W4")
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4201")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4201")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4201 /wd4100")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4201 /wd4100")
 		set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:msvcrtd.lib")
 	elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wextra -Wall -Wundef -Wno-unused-parameter -Wno-missing-field-initializers")

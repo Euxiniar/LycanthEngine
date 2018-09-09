@@ -14,7 +14,8 @@ namespace Ly {
 		VkBuffer& get();
 		VkDeviceMemory& getMemory();
 		VkDeviceSize getSize();
-		
+		static uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
 	protected:
 		VkBuffer m_buffer;
 		VkDeviceMemory m_bufferMemory;
@@ -24,6 +25,5 @@ namespace Ly {
 
 	private:
 		void create(VkBufferCreateInfo& bufferInfo, const VkMemoryPropertyFlags& properties);
-		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 	};
 }

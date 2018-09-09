@@ -25,6 +25,7 @@
 #include <IndexBuffer.h>
 #include <UniformBuffer.h>
 #include <DescriptorPool.h>
+#include <Image.h>
 
 #include <memory>
 #include <vector>
@@ -66,7 +67,14 @@ namespace Ly {
 		void createUniformBuffer();
 		void createDescriptorPool();
 		void createDescriptorSet();
+		void createTextureImage();
+		void createImage(uint32_t width, uint32_t height);
 		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer);
+		VkCommandBuffer beginSingleTimeCommands();
+		void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+		void transitionImageLayout(VkImage image, VkFormat format, 
+			VkImageLayout oldLayout, VkImageLayout newLayout);
+		void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 
 		const std::vector<const char*> m_deviceExtensions = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -116,5 +124,6 @@ namespace Ly {
 		std::vector<std::unique_ptr<Ly::SyncObject>> m_syncObjects;
 		std::unique_ptr<Ly::DescriptorPool> m_descriptorPool;
 		std::vector<VkDescriptorSet> m_descriptorSets;
+		std::unique_ptr<Ly::Image> m_textureImage;
 	};
 }

@@ -144,6 +144,12 @@ set(DESCRIPTOR_POOL
     PARENT_SCOPE
 )
 
+set(IMAGE
+	${DIR}/Image.h
+	${DIR}/Image.cpp
+    PARENT_SCOPE
+)
+
 set(CMAKE_TEXT
     ${DIR}/CMakeLists.txt
     PARENT_SCOPE
