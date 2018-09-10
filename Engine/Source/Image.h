@@ -6,7 +6,10 @@
 namespace Ly {
 	class Image {
 	public:
-		Image(VkDevice& device, VkPhysicalDevice& physicalDevice, uint32_t texWidth, uint32_t texHeight);
+		Image(VkDevice& device, VkPhysicalDevice& physicalDevice, 
+			uint32_t texWidth, uint32_t texHeight,
+			VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
+			VkMemoryPropertyFlags properties);
 		~Image();
 		VkImage& get();
 	private:
@@ -15,6 +18,8 @@ namespace Ly {
 		VkDevice& m_device;
 		VkPhysicalDevice& m_physicalDevice;
 
-		void create(uint32_t texWidth, uint32_t texHeight);
+		void create(uint32_t texWidth, uint32_t texHeight,
+			VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
+			VkMemoryPropertyFlags properties);
 	};
 }

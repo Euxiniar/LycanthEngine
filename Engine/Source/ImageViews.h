@@ -11,7 +11,7 @@ namespace Ly {
 	public:
 		ImageViews(VkDevice& device,
 		std::vector<VkImage>& swapChainImages,
-		VkFormat& swapChainImageFormat);
+		VkFormat& swapChainImageFormat, VkImageAspectFlags aspectFlags);
 		~ImageViews();
 		std::vector<std::unique_ptr<Ly::ImageView>>& get();
 
@@ -22,5 +22,6 @@ namespace Ly {
 		VkDevice& m_device;
 		std::vector<VkImage>& m_swapChainImages;
 		VkFormat& m_swapChainImageFormat;
+		VkImageAspectFlags m_aspectFlags;
 	};
 }

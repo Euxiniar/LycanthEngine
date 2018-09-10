@@ -1,8 +1,11 @@
 #include <ImageViews.h>
 
 namespace Ly {
-	ImageViews::ImageViews(VkDevice & device, std::vector<VkImage>& swapChainImages, VkFormat & swapChainImageFormat)
-		: m_device(device), m_swapChainImages(swapChainImages), m_swapChainImageFormat(swapChainImageFormat)
+	ImageViews::ImageViews(VkDevice & device, std::vector<VkImage>& swapChainImages, 
+		VkFormat & swapChainImageFormat, VkImageAspectFlags aspectFlags)
+		: m_device(device), m_swapChainImages(swapChainImages), 
+		m_swapChainImageFormat(swapChainImageFormat),
+		m_aspectFlags(aspectFlags)
 	{
 		create();
 	}
@@ -23,7 +26,7 @@ namespace Ly {
 	{
 		for (size_t i = 0; i < m_swapChainImages.size(); i++) {
 			m_swapChainImageViews.push_back(std::make_unique<Ly::ImageView>(m_device, 
-				m_swapChainImages[i], m_swapChainImageFormat));
+				m_swapChainImages[i], m_swapChainImageFormat, m_aspectFlags));
 		}
 	}
 }

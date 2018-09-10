@@ -5,7 +5,7 @@
 namespace Ly {
 	class ImageView {
 	public:
-		ImageView(VkDevice& device, VkImage& image, VkFormat format);
+		ImageView(VkDevice& device, VkImage& image, VkFormat format, VkImageAspectFlags aspectFlags);
 		~ImageView();
 		VkImageView& get();
 
@@ -14,6 +14,7 @@ namespace Ly {
 		VkDevice& m_device;
 		VkImage& m_image;
 		VkFormat m_format;
+		VkImageAspectFlags m_aspectFlags;
 
 		void create();
 	};

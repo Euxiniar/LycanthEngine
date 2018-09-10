@@ -2,6 +2,7 @@
 #include <vulkan/vulkan.h>
 #include <Utils/Log.h>
 #include <vector>
+#include <array>
 
 namespace Ly {
 	class CommandBuffers {

@@ -40,6 +40,8 @@ namespace Ly
 
 	void VulkanLoader::cleanupSwapChain()
 	{
+		m_depthImageView.reset();
+		m_depthImage.reset();
 		m_swapChainFramebuffers.reset();
 		m_commandBuffers.reset();
 		m_graphicsPipeline.reset();
@@ -68,6 +70,7 @@ namespace Ly
 		createRenderPass();
 		createPipelineLayout();
 		createGraphicsPipeline();
+		createDepthResources();
 		createFramebuffers();
 		createCommandBuffers();
 	}
@@ -86,8 +89,9 @@ namespace Ly
 		createDescriptorSetLayout();
 		createPipelineLayout();
 		createGraphicsPipeline();
-		createFramebuffers();
 		createCommandPool();
+		createDepthResources();
+		createFramebuffers();
 		createTextureImage();
 		createTextureImageView();
 		createTextureSampler();
@@ -142,19 +146,20 @@ namespace Ly
 
 	void VulkanLoader::createSwapChain()
 	{
-		m_swapChain = std::make_unique<Swapchain>(m_window, m_physicalDevice->get(), 
+		m_swapChain = std::make_unique<Ly::Swapchain>(m_window, m_physicalDevice->get(), 
 			m_surface, m_device->get(), m_swapChainImages, m_swapChainImageFormat, 
 			m_swapChainExtent);
 	}
 
 	void VulkanLoader::createImageViews()
 	{
-		m_swapChainImageViews = std::make_unique<Ly::ImageViews>(m_device->get(), m_swapChainImages, m_swapChainImageFormat);
+		m_swapChainImageViews = std::make_unique<Ly::ImageViews>(m_device->get(), m_swapChainImages, m_swapChainImageFormat, 
+			VK_IMAGE_ASPECT_COLOR_BIT);
 	}
 
 	void VulkanLoader::createRenderPass()
 	{
-		m_renderPass = std::make_unique<Ly::RenderPass>(m_device->get(), m_swapChainImageFormat);
+		m_renderPass = std::make_unique<Ly::RenderPass>(m_device->get(), m_swapChainImageFormat, findDepthFormat());
 	}
 
 	void VulkanLoader::createDescriptorSetLayout()
@@ -176,7 +181,7 @@ namespace Ly
 	void VulkanLoader::createFramebuffers()
 	{
 		m_swapChainFramebuffers = std::make_unique<Ly::Framebuffers>(m_device->get(), 
-			m_swapChainImageViews->get(), m_renderPass->get(), m_swapChainExtent);
+			m_swapChainImageViews->get(), m_renderPass->get(), m_swapChainExtent, m_depthImageView->get());
 	}
 
 	void VulkanLoader::createCommandPool()
@@ -316,7 +321,8 @@ namespace Ly
 
 	void VulkanLoader::createTextureImageView()
 	{
-		m_textureImageView = std::make_unique<Ly::ImageView>(m_device->get(), m_textureImage->get(), VK_FORMAT_R8G8B8A8_UNORM);
+		m_textureImageView = std::make_unique<Ly::ImageView>(m_device->get(), m_textureImage->get(), VK_FORMAT_R8G8B8A8_UNORM, 
+			VK_IMAGE_ASPECT_COLOR_BIT);
 	}
 
 	void VulkanLoader::createTextureSampler()
@@ -326,7 +332,9 @@ namespace Ly
 
 	void VulkanLoader::createImage(uint32_t width, uint32_t height)
 	{
-		m_textureImage = std::make_unique<Ly::Image>(m_device->get(), m_physicalDevice->get(), width, height);
+		m_textureImage = std::make_unique<Ly::Image>(m_device->get(), m_physicalDevice->get(), width, height, 
+			VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, 
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 	}
 
 	void VulkanLoader::createCommandBuffers()
@@ -426,6 +434,16 @@ namespace Ly
 		endSingleTimeCommands(commandBuffer);
 	}
 
+	void VulkanLoader::createDepthResources()
+	{
+		VkFormat depthFormat = findDepthFormat();
+		m_depthImage = std::make_unique<Ly::Image>(m_device->get(), m_physicalDevice->get(), m_swapChainExtent.width, m_swapChainExtent.height,
+			depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		m_depthImageView = std::make_unique<Ly::ImageView>(m_device->get(), m_depthImage->get(), depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+		transitionImageLayout(m_depthImage->get(), depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+	}
+
 	VkCommandBuffer VulkanLoader::beginSingleTimeCommands() {
 		VkCommandBufferAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -470,7 +488,17 @@ namespace Ly
 		barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		barrier.image = image;
-		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+			if (hasStencilComponent(format)) {
+				barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+			}
+		}
+		else {
+			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		}
+
 		barrier.subresourceRange.baseMipLevel = 0;
 		barrier.subresourceRange.levelCount = 1;
 		barrier.subresourceRange.baseArrayLayer = 0;
@@ -492,6 +520,13 @@ namespace Ly
 
 			sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 			destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		}
+		else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+			barrier.srcAccessMask = 0;
+			barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+			sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+			destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 		}
 		else {
 			throw std::invalid_argument("unsupported layout transition!");
@@ -538,6 +573,38 @@ namespace Ly
 		);
 
 		endSingleTimeCommands(commandBuffer);
+	}
+
+	VkFormat VulkanLoader::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
+	{
+		for (VkFormat format : candidates) {
+			VkFormatProperties props;
+			vkGetPhysicalDeviceFormatProperties(m_physicalDevice->get(), format, &props);
+
+			if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
+				return format;
+			}
+			else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
+				return format;
+			}
+		}
+
+		Ly::Log::error("Failed to find supported format!");
+		return VkFormat();
+	}
+
+	VkFormat VulkanLoader::findDepthFormat()
+	{
+		return findSupportedFormat(
+			{ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
+			VK_IMAGE_TILING_OPTIMAL,
+			VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
+		);
+	}
+
+	bool VulkanLoader::hasStencilComponent(VkFormat format)
+	{
+		return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 	}
 
 }

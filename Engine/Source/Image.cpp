@@ -1,10 +1,13 @@
 #include "Image.h"
 
 namespace Ly {
-	Image::Image(VkDevice& device, VkPhysicalDevice& physicalDevice, uint32_t imageWidth, uint32_t imageHeight)
+	Image::Image(VkDevice& device, VkPhysicalDevice& physicalDevice, 
+		uint32_t imageWidth, uint32_t imageHeight,
+		VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, 
+		VkMemoryPropertyFlags properties)
 		: m_device(device), m_physicalDevice(physicalDevice)
 	{
-		create(imageWidth, imageHeight);
+		create(imageWidth, imageHeight, format, tiling, usage, properties);
 	}
 
 	Image::~Image()
@@ -18,7 +21,9 @@ namespace Ly {
 		return m_image;
 	}
 
-	void Image::create(uint32_t imageWidth, uint32_t imageHeight)
+	void Image::create(uint32_t imageWidth, uint32_t imageHeight,
+		VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
+		VkMemoryPropertyFlags properties)
 	{
 		VkImageCreateInfo imageInfo = {};
 		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -28,10 +33,10 @@ namespace Ly {
 		imageInfo.extent.depth = 1;
 		imageInfo.mipLevels = 1;
 		imageInfo.arrayLayers = 1;
-		imageInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
-		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+		imageInfo.format = format;
+		imageInfo.tiling = tiling;
 		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+		imageInfo.usage = usage;
 		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.flags = 0;
@@ -47,7 +52,7 @@ namespace Ly {
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		allocInfo.allocationSize = memRequirements.size;
 		allocInfo.memoryTypeIndex = Ly::Buffer::findMemoryType(m_physicalDevice, 
-			memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+			memRequirements.memoryTypeBits, properties);
 
 		if (vkAllocateMemory(m_device, &allocInfo, nullptr, &m_imageMemory) != VK_SUCCESS) {
 			Ly::Log::error("Failed to allocate image memory!");

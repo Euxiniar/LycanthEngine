@@ -2,8 +2,8 @@
 
 namespace Ly {
 
-	ImageView::ImageView(VkDevice& device, VkImage& image, VkFormat format)
-		: m_device(device), m_image(image), m_format(format)
+	ImageView::ImageView(VkDevice& device, VkImage& image, VkFormat format, VkImageAspectFlags aspectFlags) : 
+		m_device(device), m_image(image), m_format(format), m_aspectFlags(aspectFlags)
 	{
 		create();
 	}
@@ -25,7 +25,7 @@ namespace Ly {
 		viewInfo.image = m_image;
 		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 		viewInfo.format = m_format;
-		viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		viewInfo.subresourceRange.aspectMask = m_aspectFlags;
 		viewInfo.subresourceRange.baseMipLevel = 0;
 		viewInfo.subresourceRange.levelCount = 1;
 		viewInfo.subresourceRange.baseArrayLayer = 0;

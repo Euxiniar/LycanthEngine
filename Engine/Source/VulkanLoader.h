@@ -3,6 +3,11 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <Vertex.hpp>
 #include <Window.h>
 #include <DebugCallback.h>
@@ -74,11 +79,15 @@ namespace Ly {
 		void createTextureSampler();
 		void createImage(uint32_t width, uint32_t height);
 		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer);
+		void createDepthResources();
 		VkCommandBuffer beginSingleTimeCommands();
 		void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 		void transitionImageLayout(VkImage image, VkFormat format, 
 			VkImageLayout oldLayout, VkImageLayout newLayout);
 		void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+		VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+		VkFormat findDepthFormat();
+		bool hasStencilComponent(VkFormat format);
 
 		const std::vector<const char*> m_deviceExtensions = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -137,5 +146,7 @@ namespace Ly {
 		std::unique_ptr<Ly::Image> m_textureImage;
 		std::unique_ptr<Ly::ImageView> m_textureImageView;
 		std::unique_ptr<Ly::Sampler> m_textureSampler;
+		std::unique_ptr<Ly::Image> m_depthImage;
+		std::unique_ptr<Ly::ImageView> m_depthImageView;
 	};
 }
