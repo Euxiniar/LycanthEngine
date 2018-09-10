@@ -25,7 +25,7 @@ namespace Ly {
 			}
 
 			if (queueFamilyCount == 1) {
-				indices.presentFamily = indices.graphicsFamily;
+				indices.transferFamily = indices.graphicsFamily;
 			}
 			else if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT && !(queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT))
 			{
