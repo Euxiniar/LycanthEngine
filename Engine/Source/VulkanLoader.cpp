@@ -188,7 +188,7 @@ namespace Ly
 	{
 		QueueFamilyIndices queueFamilyIndices = QueueFamily::findQueueFamilies(m_physicalDevice->get(), m_surface);
 		m_commandPools.push_back(std::make_unique<Ly::CommandPool>(m_device->get(), queueFamilyIndices.graphicsFamily));
-		m_commandPools.push_back(std::make_unique<Ly::CommandPool>(m_device->get(), queueFamilyIndices.presentFamily));
+		m_commandPools.push_back(std::make_unique<Ly::CommandPool>(m_device->get(), queueFamilyIndices.transferFamily));
 	}
 
 	void VulkanLoader::createVertexBuffer()
@@ -423,7 +423,7 @@ namespace Ly
 
 	void VulkanLoader::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer)
 	{
-		VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+		VkCommandBuffer commandBuffer = beginSingleTimeCommands(m_commandPools[1]->get());
 
 		VkBufferCopy copyRegion = {};
 		copyRegion.srcOffset = 0; 
@@ -431,7 +431,7 @@ namespace Ly
 		copyRegion.size = m_vertexBuffer->getSize();
 		vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-		endSingleTimeCommands(commandBuffer);
+		endSingleTimeCommands(commandBuffer, m_commandPools[1]->get(), m_transferQueue);
 	}
 
 	void VulkanLoader::createDepthResources()
@@ -444,11 +444,11 @@ namespace Ly
 		transitionImageLayout(m_depthImage->get(), depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 	}
 
-	VkCommandBuffer VulkanLoader::beginSingleTimeCommands() {
+	VkCommandBuffer VulkanLoader::beginSingleTimeCommands(VkCommandPool& commandPool) {
 		VkCommandBufferAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		allocInfo.commandPool = m_commandPools[1]->get();
+		allocInfo.commandPool = commandPool;
 		allocInfo.commandBufferCount = 1;
 
 		VkCommandBuffer commandBuffer;
@@ -463,7 +463,7 @@ namespace Ly
 		return commandBuffer;
 	}
 
-	void VulkanLoader::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+	void VulkanLoader::endSingleTimeCommands(VkCommandBuffer commandBuffer, VkCommandPool& commandPool, VkQueue& queue) {
 		vkEndCommandBuffer(commandBuffer);
 
 		VkSubmitInfo submitInfo = {};
@@ -471,15 +471,15 @@ namespace Ly
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &commandBuffer;
 
-		vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-		vkQueueWaitIdle(m_graphicsQueue);
+		vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
+		vkQueueWaitIdle(queue);
 
-		vkFreeCommandBuffers(m_device->get(), m_commandPools[1]->get(), 1, &commandBuffer);
+		vkFreeCommandBuffers(m_device->get(), commandPool, 1, &commandBuffer);
 	}
 
 	void VulkanLoader::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout)
 	{
-		VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+		VkCommandBuffer commandBuffer = beginSingleTimeCommands(m_commandPools[0]->get());
 
 		VkImageMemoryBarrier barrier = {};
 		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -541,12 +541,12 @@ namespace Ly
 			1, &barrier
 		);
 
-		endSingleTimeCommands(commandBuffer);
+		endSingleTimeCommands(commandBuffer, m_commandPools[0]->get(), m_graphicsQueue);
 	}
 
 	void VulkanLoader::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height)
 	{
-		VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+		VkCommandBuffer commandBuffer = beginSingleTimeCommands(m_commandPools[1]->get());
 
 		VkBufferImageCopy region = {};
 		region.bufferOffset = 0;
@@ -572,7 +572,7 @@ namespace Ly
 			&region
 		);
 
-		endSingleTimeCommands(commandBuffer);
+		endSingleTimeCommands(commandBuffer, m_commandPools[1]->get(), m_transferQueue);
 	}
 
 	VkFormat VulkanLoader::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features)

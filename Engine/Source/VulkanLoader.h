@@ -80,8 +80,8 @@ namespace Ly {
 		void createImage(uint32_t width, uint32_t height);
 		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer);
 		void createDepthResources();
-		VkCommandBuffer beginSingleTimeCommands();
-		void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+		VkCommandBuffer beginSingleTimeCommands(VkCommandPool& commandPool);
+		void endSingleTimeCommands(VkCommandBuffer commandBuffer, VkCommandPool& commandPool, VkQueue& queue);
 		void transitionImageLayout(VkImage image, VkFormat format, 
 			VkImageLayout oldLayout, VkImageLayout newLayout);
 		void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
