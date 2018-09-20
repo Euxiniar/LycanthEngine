@@ -1,20 +1,14 @@
-#include <Renderer.h>
-#include <stdexcept>
-#include <iostream>
+#include "Application.hpp"
+#include "MainFrame.hpp"
 
-int main()
+namespace vkapp
 {
+	Application::Application()
+		: App(appName)
 	{
-		Ly::Renderer renderer;
-
-		try {
-			renderer.run();
-		}
-		catch (const std::runtime_error& e) {
-			std::cerr << e.what() << std::endl;
-			return EXIT_FAILURE;
-		}
 	}
-	getchar();
-	return 0;
+	std::unique_ptr<common::MainFrame> Application::doCreateMainFrame()
+	{
+		return std::make_unique<MainFrame>();
+	}
 }

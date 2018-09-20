@@ -13,7 +13,12 @@ project (${PROJECT})
 
 if(WIN32)
 add_executable(${PROJECT} WIN32
-    ProjectLauncher/Application.cpp
+	ProjectLauncher/Main.cpp
+	ProjectLauncher/Application.cpp
+	ProjectLauncher/Application.hpp
+	ProjectLauncher/MainFrame.cpp
+	ProjectLauncher/MainFrame.hpp
+	ProjectLauncher/Prerequisites.hpp
 )
 endif(WIN32)
 
@@ -43,63 +48,18 @@ set(SHADERS
 
 add_library(${ENGINE} STATIC
     ${BASE}
-	${RENDERER}
-	${WINDOW}
-	${INSTANCE}
-	${PHYSICAL_DEVICE}
-	${LOGICAL_DEVICE}
-	${COMMAND_POOL}
-	${VULKAN_LOADER}
-	${UTILS}
+	${COMMON}
+	${CORE}
 	${CMAKE_TEXT}
 	${SHADERS}
-	${SWAPCHAIN}
-	${SYNC_OBJECT}
-	${SHADER_MODULE}
-	${RENDER_PASS}
-	${QUEUE_FAMILY}
-	${GRAPHICS_PIPELINE}
-	${PIPELINE_LAYOUT}
-	${DESCRIPTOR_SET_LAYOUT}
-	${BUFFER}
-	${VERTEX_BUFFER}
-	${INDEX_BUFFER}
-	${UNIFORM_BUFFER}
-	${DESCRIPTOR_POOL}
-	${IMAGE}
-	${IMAGE_VIEW}
-	${SAMPLER}
-
 )
 
 source_group( Shaders FILES ${SHADERS})
 
 source_group( Engine FILES ${BASE})
-source_group( Engine\\Renderer FILES ${RENDERER})
-source_group( Engine\\Window FILES ${WINDOW})
-source_group( Engine\\Instance FILES ${INSTANCE})
-source_group( Engine\\Physical_Device FILES ${PHYSICAL_DEVICE})
-source_group( Engine\\Logical_Device FILES ${LOGICAL_DEVICE})
-source_group( Engine\\Command_Pool FILES ${COMMAND_POOL})
-source_group( Engine\\Vulkan_Loader FILES ${VULKAN_LOADER})
-source_group( Engine\\Utils FILES ${UTILS})
-source_group( Engine\\Swapchain FILES ${SWAPCHAIN})
-source_group( Engine\\Sync_Object FILES ${SYNC_OBJECT})
 source_group( Engine\\Shader_Module FILES ${SHADER_MODULE})
-source_group( Engine\\Render_Pass FILES ${RENDER_PASS})
-source_group( Engine\\Queue_Family FILES ${QUEUE_FAMILY})
-source_group( Engine\\Graphics_Pipeline FILES ${GRAPHICS_PIPELINE})
-source_group( Engine\\Pipeline_Layout FILES ${PIPELINE_LAYOUT})
-source_group( Engine\\Descriptor_Set_Layout FILES ${DESCRIPTOR_SET_LAYOUT})
-source_group( Engine\\Buffer FILES ${BUFFER})
-source_group( Engine\\Vertex_Buffer FILES ${VERTEX_BUFFER})
-source_group( Engine\\Index_Buffer FILES ${INDEX_BUFFER})
-source_group( Engine\\Uniform_Buffer FILES ${UNIFORM_BUFFER})
-source_group( Engine\\Descriptor_Pool FILES ${DESCRIPTOR_POOL})
-source_group( Engine\\Image FILES ${IMAGE})
-source_group( Engine\\Image_View FILES ${IMAGE_VIEW})
-source_group( Engine\\Sampler FILES ${SAMPLER})
-
+source_group( Engine\\Common FILES ${COMMON})
+source_group( Engine\\Core FILES ${CORE})
 source_group( CMake FILES ${CMAKE_TEXT})
 
 add_dependencies (${PROJECT} ${ENGINE})

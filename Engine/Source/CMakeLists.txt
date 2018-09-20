@@ -51,12 +51,14 @@ SET(LOGICAL_DEVICE
 SET(COMMAND_POOL
 	${DIR}/CommandPool.h
 	${DIR}/CommandPool.cpp
+	${DIR}/Common/Prerequisites.hpp
 	PARENT_SCOPE
 )
 
 SET(VULKAN_LOADER
 	${DIR}/VulkanLoader.h
     ${DIR}/VulkanLoader.cpp
+	${DIR}/Core/Renderer.hpp
 	PARENT_SCOPE
 )
 
@@ -146,23 +148,4 @@ set(DESCRIPTOR_POOL
 
 set(IMAGE
 	${DIR}/Image.h
-	${DIR}/Image.cpp
-    PARENT_SCOPE
-)
-
-set(IMAGE_VIEW
-	${DIR}/ImageView.h
-	${DIR}/ImageView.cpp
-    PARENT_SCOPE
-)
-
-set(SAMPLER
-	${DIR}/Sampler.h
-	${DIR}/Sampler.cpp
-    PARENT_SCOPE
-)
-
-set(CMAKE_TEXT
-    ${DIR}/CMakeLists.txt
-    PARENT_SCOPE
 )
