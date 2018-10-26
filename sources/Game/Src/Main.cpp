@@ -1,8 +1,9 @@
-#include <App.h>
+#include <Application.hpp>
+#include <misc/object_tracker.h>
 
 int main()
 {
-	std::unique_ptr<App> app_ptr(new App());
+	std::unique_ptr<Ly::Application> app_ptr(new Ly::Application("LycanthGame"));
 
 	app_ptr->init();
 	app_ptr->run();
