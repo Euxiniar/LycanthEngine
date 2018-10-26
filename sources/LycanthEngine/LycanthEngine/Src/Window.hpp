@@ -13,6 +13,7 @@ namespace Ly
 		Window(std::string appName, const int sizeX, const int sizeY, std::function<void()> loopFunction);
 		~Window();
 		void run();
+		Anvil::WindowUniquePtr* get_window();
 
 	private:
 		Anvil::WindowUniquePtr m_window_ptr;

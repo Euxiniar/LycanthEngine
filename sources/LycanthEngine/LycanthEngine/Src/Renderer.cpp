@@ -52,4 +52,15 @@ namespace Ly
 
 		return false;
 	}
+
+	Anvil::BaseDeviceUniquePtr* Renderer::get_device()
+	{
+		return &m_device_ptr;
+	}
+
+	Anvil::InstanceUniquePtr* Renderer::get_instance()
+	{
+		return &m_instance_ptr;
+	}
+
 }

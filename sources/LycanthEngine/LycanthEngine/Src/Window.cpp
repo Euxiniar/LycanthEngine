@@ -9,14 +9,10 @@ namespace Ly
 
 	Window::Window(std::string appName, const int sizeX, const int sizeY, std::function<void()> loopFunction)
 	{
-#ifdef ENABLE_OFFSCREEN_RENDERING
-		const Anvil::WindowPlatform platform = Anvil::WINDOW_PLATFORM_DUMMY_WITH_PNG_SNAPSHOTS;
-#else
 #ifdef _WIN32
 		const Anvil::WindowPlatform platform = Anvil::WINDOW_PLATFORM_SYSTEM;
 #else
 		const Anvil::WindowPlatform platform = Anvil::WINDOW_PLATFORM_XCB;
-#endif
 #endif
 
 		/* Create a window */
@@ -38,4 +34,10 @@ namespace Ly
 	{
 		m_window_ptr->run();
 	}
+
+	Anvil::WindowUniquePtr* Window::get_window()
+	{
+		return &m_window_ptr;
+	}
+
 }

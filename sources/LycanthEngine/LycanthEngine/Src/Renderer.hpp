@@ -17,6 +17,9 @@ namespace Ly
 		static std::unique_ptr<Renderer> create(std::string app_name, std::string engine_name, bool enable_validation);
 		Renderer(std::string app_name, std::string engine_name, bool enable_validation);
 		~Renderer();
+		Anvil::BaseDeviceUniquePtr* get_device();
+		Anvil::InstanceUniquePtr* get_instance();
+
 	private:
 		Anvil::InstanceUniquePtr m_instance_ptr;
 		const Anvil::PhysicalDevice* m_physical_device_ptr;
