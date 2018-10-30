@@ -25,6 +25,8 @@ namespace Ly
 		m_window_ptr = Window::create(m_appName, 1280, 720, std::bind(&Application::draw_frame,
 			this));
 		m_swapchain_ptr = Swapchain::create(*m_renderer_ptr, *m_window_ptr);
+		m_buffers_ptr = Buffers::create(*m_renderer_ptr);
+		m_dsg_ptr = Descriptor_Set_Group::create(*m_renderer_ptr, *m_buffers_ptr);
 	}
 
 	void Application::run()
