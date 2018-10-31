@@ -143,4 +143,14 @@ namespace Ly
 				Anvil::ShaderStage::VERTEX)
 		);
 	}
+	std::unique_ptr<Anvil::ShaderModuleStageEntryPoint>& Shaders::get_fragment_shader()
+	{
+		return m_fs_ptr;
+	}
+
+	std::unique_ptr<Anvil::ShaderModuleStageEntryPoint>& Shaders::get_vertex_shader()
+	{
+		return m_vs_ptr;
+	}
+
 }

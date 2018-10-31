@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <wrappers/swapchain.h>
+#include <misc/swapchain_create_info.h>
 #include <wrappers/rendering_surface.h>
 #include <wrappers/queue.h>
 

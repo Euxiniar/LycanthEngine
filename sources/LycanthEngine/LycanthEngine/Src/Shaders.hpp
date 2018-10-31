@@ -11,6 +11,9 @@ namespace Ly
 	public:
 		static std::unique_ptr<Ly::Shaders> create(Ly::Renderer& renderer);
 		Shaders(Ly::Renderer& renderer);
+		std::unique_ptr<Anvil::ShaderModuleStageEntryPoint>& get_fragment_shader();
+		std::unique_ptr<Anvil::ShaderModuleStageEntryPoint>& get_vertex_shader();
+
 	private:
 		std::unique_ptr<Anvil::ShaderModuleStageEntryPoint> m_fs_ptr;
 		std::unique_ptr<Anvil::ShaderModuleStageEntryPoint> m_vs_ptr;

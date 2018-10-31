@@ -30,6 +30,7 @@ namespace Ly
 		m_framebuffers_ptr = Framebuffers::create(*m_renderer_ptr, *m_swapchain_ptr);
 		m_semaphores_ptr = Semaphores::create(*m_renderer_ptr, *m_swapchain_ptr);
 		m_shaders_ptr = Shaders::create(*m_renderer_ptr);
+		m_gfx_ptr = Gfx_pipelines::create(*m_renderer_ptr, *m_swapchain_ptr, *m_dsg_ptr, *m_shaders_ptr);
 	}
 
 	void Application::run()

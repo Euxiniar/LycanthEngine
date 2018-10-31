@@ -35,4 +35,9 @@ namespace Ly
 	{
 	}
 
+	Anvil::DescriptorSetGroupUniquePtr& Descriptor_Set_Group::get_dsg()
+	{
+		return m_dsg_ptr;
+	}
+
 }

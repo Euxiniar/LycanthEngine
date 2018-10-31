@@ -8,6 +8,7 @@
 #include "Framebuffers.hpp"
 #include "Semaphores.hpp"
 #include "Shaders.hpp"
+#include "Gfx_pipelines.hpp"
 
 namespace Ly
 {
@@ -29,6 +30,7 @@ namespace Ly
 		std::unique_ptr<Framebuffers> m_framebuffers_ptr;
 		std::unique_ptr<Semaphores> m_semaphores_ptr;
 		std::unique_ptr<Shaders> m_shaders_ptr;
+		std::unique_ptr<Gfx_pipelines> m_gfx_ptr;
 
 		std::string m_appName = "Game";
 
