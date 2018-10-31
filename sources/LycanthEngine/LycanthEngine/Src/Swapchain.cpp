@@ -47,4 +47,10 @@ namespace Ly
 	{
 
 	}
+
+	Anvil::SwapchainUniquePtr& Swapchain::get_swapchain()
+	{
+		return m_swapchain_ptr;
+	}
+
 }

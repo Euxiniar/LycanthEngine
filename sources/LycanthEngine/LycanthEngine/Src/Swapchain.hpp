@@ -16,6 +16,8 @@ namespace Ly
 		static std::unique_ptr<Ly::Swapchain> create(Ly::Renderer& renderer, Ly::Window& window);
 		Swapchain(Ly::Renderer& renderer, Ly::Window& window);
 		~Swapchain();
+		Anvil::SwapchainUniquePtr& get_swapchain();
+
 	private:
 		Anvil::SwapchainUniquePtr m_swapchain_ptr;
 		Anvil::RenderingSurfaceUniquePtr m_rendering_surface_ptr;

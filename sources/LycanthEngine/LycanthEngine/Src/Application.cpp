@@ -27,6 +27,7 @@ namespace Ly
 		m_swapchain_ptr = Swapchain::create(*m_renderer_ptr, *m_window_ptr);
 		m_buffers_ptr = Buffers::create(*m_renderer_ptr);
 		m_dsg_ptr = Descriptor_Set_Group::create(*m_renderer_ptr, *m_buffers_ptr);
+		m_framebuffers_ptr = Framebuffers::create(*m_renderer_ptr, *m_swapchain_ptr);
 	}
 
 	void Application::run()
