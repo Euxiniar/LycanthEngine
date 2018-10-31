@@ -29,6 +29,7 @@ namespace Ly
 		m_dsg_ptr = Descriptor_Set_Group::create(*m_renderer_ptr, *m_buffers_ptr);
 		m_framebuffers_ptr = Framebuffers::create(*m_renderer_ptr, *m_swapchain_ptr);
 		m_semaphores_ptr = Semaphores::create(*m_renderer_ptr, *m_swapchain_ptr);
+		m_shaders_ptr = Shaders::create(*m_renderer_ptr);
 	}
 
 	void Application::run()
