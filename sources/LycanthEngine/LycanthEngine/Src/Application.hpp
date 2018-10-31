@@ -6,6 +6,7 @@
 #include "Buffers.hpp"
 #include "Descriptor_Set_Group.hpp"
 #include "Framebuffers.hpp"
+#include "Semaphores.hpp"
 
 namespace Ly
 {
@@ -25,6 +26,7 @@ namespace Ly
 		std::unique_ptr<Buffers> m_buffers_ptr;
 		std::unique_ptr<Descriptor_Set_Group> m_dsg_ptr;
 		std::unique_ptr<Framebuffers> m_framebuffers_ptr;
+		std::unique_ptr<Semaphores> m_semaphores_ptr;
 		std::string m_appName = "Game";
 
 		void draw_frame();

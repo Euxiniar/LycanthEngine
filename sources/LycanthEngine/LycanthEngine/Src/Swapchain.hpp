@@ -17,6 +17,7 @@ namespace Ly
 		Swapchain(Ly::Renderer& renderer, Ly::Window& window);
 		~Swapchain();
 		Anvil::SwapchainUniquePtr& get_swapchain();
+		uint32_t get_n_swapchain_images();
 
 	private:
 		Anvil::SwapchainUniquePtr m_swapchain_ptr;

@@ -53,4 +53,9 @@ namespace Ly
 		return m_swapchain_ptr;
 	}
 
+	uint32_t Swapchain::get_n_swapchain_images()
+	{
+		return m_n_swapchain_images;
+	}
+
 }
