@@ -145,4 +145,9 @@ namespace Ly
 	{
 	}
 
+	Anvil::PrimaryCommandBufferUniquePtr& Command_buffers::get_command_buffer(uint32_t position)
+	{
+		return m_command_buffers[position];
+	}
+
 }

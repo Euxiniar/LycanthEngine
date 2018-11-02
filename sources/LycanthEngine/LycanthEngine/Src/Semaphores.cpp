@@ -39,4 +39,23 @@ namespace Ly
 		}
 	}
 
+	uint32_t Semaphores::get_n_last_semaphore_used()
+	{
+		return m_n_last_semaphore_used;
+	}
+
+	void Semaphores::set_n_last_semaphore_used(uint32_t value)
+	{
+		m_n_last_semaphore_used = value;
+	}
+
+	Anvil::SemaphoreUniquePtr& Semaphores::get_frame_signal_semaphore(uint32_t position)
+	{
+		return m_frame_signal_semaphores[position];
+	}
+
+	Anvil::SemaphoreUniquePtr& Semaphores::get_frame_wait_semaphore(uint32_t position)
+	{
+		return m_frame_wait_semaphores[position];
+	}
 }

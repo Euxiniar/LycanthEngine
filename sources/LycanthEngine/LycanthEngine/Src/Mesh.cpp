@@ -4,7 +4,7 @@ namespace Ly
 {
 	const unsigned char* Mesh::get_mesh_data() const
 	{
-		return reinterpret_cast<const unsigned char*>(g_mesh_data.data());
+		return reinterpret_cast<const unsigned char*>(g_mesh_data);
 	}
 
 	Anvil::Format Mesh::get_mesh_data_color_format()
@@ -39,7 +39,7 @@ namespace Ly
 
 	uint32_t Mesh::get_mesh_data_size() const
 	{
-		return sizeof(g_mesh_data.data());
+		return sizeof(g_mesh_data);
 	}
 
 	uint32_t Mesh::get_mesh_n_vertices()

@@ -22,7 +22,7 @@ namespace Ly
 			uint32_t*                 out_result_size_ptr);
 
 	private:
-		const std::array<float, 21> g_mesh_data =
+		const float g_mesh_data[21] =
 		{
 		   -1.0f,  1.0f,  0.0f, 1.0f,   /* position */
 			0.75f, 0.25f, 0.1f,         /* color    */

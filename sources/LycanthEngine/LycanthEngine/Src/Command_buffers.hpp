@@ -22,6 +22,8 @@ namespace Ly
 		Command_buffers(Ly::Renderer& renderer, Ly::Swapchain& swapchain,
 			Ly::Buffers& buffers, Ly::Framebuffers& framebuffers, Ly::Gfx_pipelines& gfx_pipelines, Ly::Descriptor_Set_Group& dsg);
 		~Command_buffers();
+
+		Anvil::PrimaryCommandBufferUniquePtr& get_command_buffer(uint32_t position);
 	private:
 		std::array<Anvil::PrimaryCommandBufferUniquePtr, N_SWAPCHAIN_IMAGES> m_command_buffers;
 	};

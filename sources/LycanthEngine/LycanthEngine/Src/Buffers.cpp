@@ -83,4 +83,40 @@ namespace Ly
 		return m_mesh_data_buffer_ptr;
 	}
 
+	void Buffers::update_data_ub_contents(Ly::Renderer& renderer, uint32_t& in_n_swapchain_image)
+	{
+		struct
+		{
+			int   frame_index[4];      /* frame index + padding (ivec3) */
+			float position_rotation[16 * 4]; /* pos (vec2) + rot (vec2)       */
+			float size[16];
+		} data;
+
+		char*           mapped_data_ptr = nullptr;
+		static uint32_t n_frames_rendered = 0;
+		const float     scale_factor = 1.35f;
+
+		data.frame_index[0] = static_cast<int>(m_time.get_time_in_msec() / 2); /* slow down a little */
+
+		for (unsigned int n_triangle = 0;
+			n_triangle < N_TRIANGLES;
+			++n_triangle)
+		{
+			float x = cos(3.14152965f * 2.0f * float(n_triangle) / float(N_TRIANGLES)) * 0.5f * scale_factor;
+			float y = sin(3.14152965f * 2.0f * float(n_triangle) / float(N_TRIANGLES)) * 0.5f * scale_factor;
+
+			data.position_rotation[n_triangle * 4 + 0] = x;
+			data.position_rotation[n_triangle * 4 + 1] = y;
+			data.position_rotation[n_triangle * 4 + 2] = float(data.frame_index[0]) / 360.0f + 3.14152965f * 2.0f * float(n_triangle) / float(N_TRIANGLES);
+			data.position_rotation[n_triangle * 4 + 3] = float(data.frame_index[0]) / 360.0f + 3.14152965f * 2.0f * float(n_triangle) / float(N_TRIANGLES);
+			data.size[n_triangle] = 0.2f;
+		}
+
+		m_data_buffer_ptr->write(in_n_swapchain_image * m_ub_data_size_per_swapchain_image, /* start_offset */
+			sizeof(data),
+			&data,
+			renderer.get_device()->get()->get_universal_queue(0));
+
+		++n_frames_rendered;
+	}
 }
