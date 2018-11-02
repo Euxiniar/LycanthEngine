@@ -143,6 +143,12 @@ namespace Ly
 
 	Command_buffers::~Command_buffers()
 	{
+		for (uint32_t n_swapchain_image = 0;
+			n_swapchain_image < N_SWAPCHAIN_IMAGES;
+			++n_swapchain_image)
+		{
+			m_command_buffers[n_swapchain_image].reset();
+		}
 	}
 
 	Anvil::PrimaryCommandBufferUniquePtr& Command_buffers::get_command_buffer(uint32_t position)

@@ -21,8 +21,7 @@ namespace Ly
 	void Application::init()
 	{
 		m_renderer_ptr = Renderer::create(m_appName, ENGINE_NAME, true);
-		m_window_ptr = Window::create(m_appName, 1280, 720, std::bind(&Application::draw_frame,
-			this));
+		m_window_ptr = Window::create(m_appName, 1280, 720, std::bind(&Application::draw_frame, this));
 		m_swapchain_ptr = Swapchain::create(*m_renderer_ptr, *m_window_ptr);
 		m_buffers_ptr = Buffers::create(*m_renderer_ptr);
 		m_dsg_ptr = Descriptor_Set_Group::create(*m_renderer_ptr, *m_buffers_ptr);
@@ -43,28 +42,17 @@ namespace Ly
 
 			m_gfx_ptr->set_pipeline_id(UINT32_MAX);
 		}
-
 		m_semaphores_ptr.reset();
-
 		m_swapchain_ptr.reset();
-
-		for (uint32_t n_swapchain_image = 0;
-			n_swapchain_image < N_SWAPCHAIN_IMAGES;
-			++n_swapchain_image)
-		{
-			m_command_buffers_ptr->get_command_buffer(n_swapchain_image).reset();
-		}
+		m_command_buffers_ptr.reset();
 		m_framebuffers_ptr.reset();
-
 		m_buffers_ptr->get_data_buffer_ptr().reset();
 		m_dsg_ptr.reset();
 		m_shaders_ptr->get_fragment_shader().reset();
 		m_buffers_ptr->get_mesh_data_buffer_ptr().reset();
 		m_gfx_ptr.reset();
 		m_shaders_ptr->get_vertex_shader().reset();
-
 		m_renderer_ptr.reset();
-
 		m_window_ptr.reset();
 	}
 
