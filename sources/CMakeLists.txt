@@ -1,0 +1,2 @@
+add_subdirectory(LycanthEngine)
+add_subdirectory(Game)
