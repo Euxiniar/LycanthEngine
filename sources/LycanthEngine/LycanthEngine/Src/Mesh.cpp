@@ -46,4 +46,31 @@ namespace Ly
 	{
 		return g_mesh_data_n_vertices;
 	}
+
+	void Mesh::get_luminance_data(std::unique_ptr<float[]>* out_result_ptr,
+		uint32_t*                 out_result_size_ptr)
+	{
+		std::unique_ptr<float[]> luminance_data_ptr;
+		float*                   luminance_data_raw_ptr;
+		uint32_t                 luminance_data_size;
+
+		static_assert(N_TRIANGLES == 16,
+			"Shader and the app logic assumes N_TRIANGLES will always be 16");
+
+		luminance_data_size = sizeof(float) * N_TRIANGLES;
+
+		luminance_data_ptr.reset(new float[luminance_data_size / sizeof(float)]);
+
+		luminance_data_raw_ptr = luminance_data_ptr.get();
+
+		for (uint32_t n_tri = 0;
+			n_tri < N_TRIANGLES;
+			++n_tri)
+		{
+			luminance_data_raw_ptr[n_tri] = float(n_tri) / float(N_TRIANGLES - 1);
+		}
+
+		*out_result_ptr = std::move(luminance_data_ptr);
+		*out_result_size_ptr = luminance_data_size;
+	}
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "Prerequisites.hpp"
 #include <cstdint>
 #include <misc/formats.h>
 #include <array>
@@ -17,6 +18,8 @@ namespace Ly
 		static uint32_t get_mesh_data_position_stride();
 		uint32_t get_mesh_data_size() const;
 		static uint32_t Mesh::get_mesh_n_vertices();
+		static void get_luminance_data(std::unique_ptr<float[]>* out_result_ptr,
+			uint32_t*                 out_result_size_ptr);
 
 	private:
 		const std::array<float, 21> g_mesh_data =

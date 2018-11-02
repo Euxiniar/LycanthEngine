@@ -91,4 +91,15 @@ namespace Ly
 		gfx_pipeline_manager_ptr->add_pipeline(std::move(gfx_pipeline_create_info_ptr),
 			&m_pipeline_id);
 	}
+
+	Anvil::RenderPassUniquePtr& Gfx_pipelines::get_renderPass()
+	{
+		return m_renderpass_ptr;
+	}
+
+	Anvil::PipelineID& Gfx_pipelines::get_pipeline_id()
+	{
+		return m_pipeline_id;
+	}
+
 }

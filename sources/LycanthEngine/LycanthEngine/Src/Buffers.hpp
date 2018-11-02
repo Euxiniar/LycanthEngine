@@ -17,6 +17,7 @@ namespace Ly
 		~Buffers();
 		VkDeviceSize& get_ub_data_size_per_swapchain_image();
 		Anvil::BufferUniquePtr& get_data_buffer_ptr();
+		Anvil::BufferUniquePtr& get_mesh_data_buffer_ptr();
 
 	private:
 		Anvil::BufferUniquePtr m_data_buffer_ptr;

@@ -39,4 +39,9 @@ namespace Ly
 		}
 	}
 
+	std::array<Anvil::FramebufferUniquePtr, N_SWAPCHAIN_IMAGES>& Framebuffers::get_fbos()
+	{
+		return m_fbos;
+	}
+
 }

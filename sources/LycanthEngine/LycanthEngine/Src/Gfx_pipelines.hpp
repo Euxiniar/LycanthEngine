@@ -16,6 +16,8 @@ namespace Ly
 	public:
 		static std::unique_ptr<Ly::Gfx_pipelines> create(Ly::Renderer& renderer, Ly::Swapchain& swapchain, Ly::Descriptor_Set_Group& dsg, Ly::Shaders& shaders);
 		Gfx_pipelines(Ly::Renderer& renderer, Ly::Swapchain& swapchain, Ly::Descriptor_Set_Group& dsg, Ly::Shaders& shaders);
+		Anvil::RenderPassUniquePtr& get_renderPass();
+		Anvil::PipelineID& get_pipeline_id();
 	private:
 		Anvil::RenderPassUniquePtr m_renderpass_ptr;
 		Anvil::PipelineID m_pipeline_id;

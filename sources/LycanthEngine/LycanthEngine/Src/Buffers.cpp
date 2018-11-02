@@ -78,4 +78,9 @@ namespace Ly
 		return m_data_buffer_ptr;
 	}
 
+	Anvil::BufferUniquePtr& Buffers::get_mesh_data_buffer_ptr()
+	{
+		return m_mesh_data_buffer_ptr;
+	}
+
 }
