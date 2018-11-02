@@ -13,6 +13,7 @@ namespace Ly
 	public:
 		static std::unique_ptr<Ly::Framebuffers> create(Ly::Renderer& renderer, Ly::Swapchain& swapchain);
 		Framebuffers(Ly::Renderer& renderer, Ly::Swapchain& swapchain);
+		~Framebuffers();
 		std::array<Anvil::FramebufferUniquePtr, N_SWAPCHAIN_IMAGES>& get_fbos();
 	private:
 		std::array<Anvil::FramebufferUniquePtr, N_SWAPCHAIN_IMAGES> m_fbos;

@@ -12,6 +12,7 @@ namespace Ly
 	public:
 		static std::unique_ptr<Ly::Semaphores> create(Ly::Renderer& renderer, Ly::Swapchain& swapchain);
 		Semaphores(Ly::Renderer& renderer, Ly::Swapchain& swapchain);
+		~Semaphores();
 		uint32_t get_n_last_semaphore_used();
 		void set_n_last_semaphore_used(uint32_t value);
 		Anvil::SemaphoreUniquePtr& get_frame_signal_semaphore(uint32_t position);

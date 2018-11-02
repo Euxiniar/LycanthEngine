@@ -39,6 +39,12 @@ namespace Ly
 		}
 	}
 
+	Semaphores::~Semaphores()
+	{
+		m_frame_signal_semaphores.clear();
+		m_frame_wait_semaphores.clear();
+	}
+
 	uint32_t Semaphores::get_n_last_semaphore_used()
 	{
 		return m_n_last_semaphore_used;

@@ -31,6 +31,8 @@ namespace Ly
 
 	Renderer::~Renderer()
 	{
+		m_device_ptr.reset();
+		m_instance_ptr.reset();
 	}
 
 	std::unique_ptr<Ly::Renderer> Renderer::create(std::string app_name, std::string engine_name, bool enable_validation)

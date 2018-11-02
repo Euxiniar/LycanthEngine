@@ -9,6 +9,7 @@ namespace Ly
 	}
 
 	Gfx_pipelines::Gfx_pipelines(Ly::Renderer & renderer, Ly::Swapchain& swapchain, Ly::Descriptor_Set_Group& dsg, Ly::Shaders& shaders)
+	: m_renderer(renderer)
 	{
 		Anvil::GraphicsPipelineCreateInfoUniquePtr gfx_pipeline_create_info_ptr;
 		auto                                       gfx_pipeline_manager_ptr(renderer.get_device()->get()->get_graphics_pipeline_manager());
@@ -92,6 +93,11 @@ namespace Ly
 			&m_pipeline_id);
 	}
 
+	Gfx_pipelines::~Gfx_pipelines()
+	{
+		m_renderpass_ptr.reset();
+	}
+
 	Anvil::RenderPassUniquePtr& Gfx_pipelines::get_renderPass()
 	{
 		return m_renderpass_ptr;
@@ -100,6 +106,11 @@ namespace Ly
 	Anvil::PipelineID& Gfx_pipelines::get_pipeline_id()
 	{
 		return m_pipeline_id;
+	}
+
+	void Gfx_pipelines::set_pipeline_id(uint32_t value)
+	{
+		m_pipeline_id = value;
 	}
 
 }

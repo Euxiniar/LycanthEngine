@@ -45,7 +45,8 @@ namespace Ly
 
 	Swapchain::~Swapchain()
 	{
-
+		m_rendering_surface_ptr.reset();
+		m_swapchain_ptr.reset();
 	}
 
 	Anvil::SwapchainUniquePtr& Swapchain::get_swapchain()

@@ -11,12 +11,11 @@ namespace Ly
 	Application::Application(std::string appName)
 		: m_appName(appName)
 	{
-
 	}
 
 	Application::~Application()
 	{
-
+		deinit();
 	}
 
 	void Application::init()
@@ -32,6 +31,41 @@ namespace Ly
 		m_shaders_ptr = Shaders::create(*m_renderer_ptr);
 		m_gfx_ptr = Gfx_pipelines::create(*m_renderer_ptr, *m_swapchain_ptr, *m_dsg_ptr, *m_shaders_ptr);
 		m_command_buffers_ptr = Command_buffers::create(*m_renderer_ptr, *m_swapchain_ptr, *m_buffers_ptr, *m_framebuffers_ptr, *m_gfx_ptr, *m_dsg_ptr);
+	}
+
+	void Application::deinit()
+	{
+		auto gfx_pipeline_manager_ptr = m_renderer_ptr->get_device()->get()->get_graphics_pipeline_manager();
+		Anvil::Vulkan::vkDeviceWaitIdle(m_renderer_ptr->get_device()->get()->get_device_vk());
+		if (m_gfx_ptr->get_pipeline_id() != UINT32_MAX)
+		{
+			gfx_pipeline_manager_ptr->delete_pipeline(m_gfx_ptr->get_pipeline_id());
+
+			m_gfx_ptr->set_pipeline_id(UINT32_MAX);
+		}
+
+		m_semaphores_ptr.reset();
+
+		m_swapchain_ptr.reset();
+
+		for (uint32_t n_swapchain_image = 0;
+			n_swapchain_image < N_SWAPCHAIN_IMAGES;
+			++n_swapchain_image)
+		{
+			m_command_buffers_ptr->get_command_buffer(n_swapchain_image).reset();
+		}
+		m_framebuffers_ptr.reset();
+
+		m_buffers_ptr->get_data_buffer_ptr().reset();
+		m_dsg_ptr.reset();
+		m_shaders_ptr->get_fragment_shader().reset();
+		m_buffers_ptr->get_mesh_data_buffer_ptr().reset();
+		m_gfx_ptr.reset();
+		m_shaders_ptr->get_vertex_shader().reset();
+
+		m_renderer_ptr.reset();
+
+		m_window_ptr.reset();
 	}
 
 	void Application::run()

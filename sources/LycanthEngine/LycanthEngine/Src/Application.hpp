@@ -20,6 +20,7 @@ namespace Ly
 		Application(std::string appName);
 		~Application();
 		void init();
+		void deinit();
 		void run();
 
 	private:

@@ -27,7 +27,7 @@ namespace Ly
 
 	Window::~Window()
 	{
-
+		m_window_ptr.reset();
 	}
 
 	void Window::run()

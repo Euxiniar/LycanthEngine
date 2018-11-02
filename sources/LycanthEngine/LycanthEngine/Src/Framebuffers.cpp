@@ -39,6 +39,16 @@ namespace Ly
 		}
 	}
 
+	Framebuffers::~Framebuffers()
+	{
+		for (uint32_t n_swapchain_image = 0;
+			n_swapchain_image < N_SWAPCHAIN_IMAGES;
+			++n_swapchain_image)
+		{
+			m_fbos[n_swapchain_image].reset();
+		}
+	}
+
 	std::array<Anvil::FramebufferUniquePtr, N_SWAPCHAIN_IMAGES>& Framebuffers::get_fbos()
 	{
 		return m_fbos;

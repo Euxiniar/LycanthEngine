@@ -33,6 +33,7 @@ namespace Ly
 
 	Descriptor_Set_Group::~Descriptor_Set_Group()
 	{
+		m_dsg_ptr.reset();
 	}
 
 	Anvil::DescriptorSetGroupUniquePtr& Descriptor_Set_Group::get_dsg()
