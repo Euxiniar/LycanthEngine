@@ -29,7 +29,8 @@ namespace Ly
 		m_semaphores_ptr = Semaphores::create(*m_renderer_ptr, *m_swapchain_ptr);
 		m_shaders_ptr = Shaders::create(*m_renderer_ptr);
 		m_gfx_ptr = Gfx_pipelines::create(*m_renderer_ptr, *m_swapchain_ptr, *m_dsg_ptr, *m_shaders_ptr);
-		m_command_buffers_ptr = Command_buffers::create(*m_renderer_ptr, *m_swapchain_ptr, *m_buffers_ptr, *m_framebuffers_ptr, *m_gfx_ptr, *m_dsg_ptr);
+		m_command_buffers_ptr = Command_buffers::create(*m_renderer_ptr, *m_swapchain_ptr, *m_buffers_ptr, 
+			*m_framebuffers_ptr, *m_gfx_ptr, *m_dsg_ptr);
 	}
 
 	void Application::deinit()

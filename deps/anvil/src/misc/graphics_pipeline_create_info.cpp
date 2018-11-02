@@ -75,7 +75,7 @@ Anvil::GraphicsPipelineCreateInfo::GraphicsPipelineCreateInfo(const RenderPass* 
            0,
            sizeof(m_blend_constant) );
 
-    m_cull_mode          = Anvil::CullModeFlagBits::CULL_MODE_BACK_BIT;
+    m_cull_mode          = Anvil::CullModeFlagBits::BACK_BIT;
     m_line_width         = 1.0f;
     m_min_sample_shading = 1.0f;
     m_sample_count       = Anvil::SampleCountFlagBits::_1_BIT;
@@ -234,7 +234,7 @@ end:
     return result;
 }
 
-Anvil::GraphicsPipelineCreateInfoUniquePtr Anvil::GraphicsPipelineCreateInfo::create(const Anvil::PipelineCreateFlagBits&     in_create_flags,
+Anvil::GraphicsPipelineCreateInfoUniquePtr Anvil::GraphicsPipelineCreateInfo::create(const Anvil::PipelineCreateFlags&        in_create_flags,
                                                                                      const RenderPass*                        in_renderpass_ptr,
                                                                                      SubPassID                                in_subpass_id,
                                                                                      const ShaderModuleStageEntryPoint&       in_fragment_shader_stage_entrypoint_info,
